@@ -1,269 +1,295 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kishoreganj-1 Substation Monitoring</title>
+<title>Kishoreganj PBS | Kishoreganj-1 Substation</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-*{box-sizing:border-box}
-body{
+:root {
+  --navy:#10243a;
+  --blue:#1769aa;
+  --green:#15803d;
+  --red:#dc2626;
+  --bg:#f1f5f9;
+  --text:#1e293b;
+  --muted:#64748b;
+  --border:#dbe3ec;
+}
+* {box-sizing:border-box}
+body {
   margin:0;
   font-family:Arial,"Noto Sans Bengali",sans-serif;
-  background:#f1f5f9;
-  color:#1e293b
+  background:var(--bg);
+  color:var(--text);
 }
-header{
-  background:linear-gradient(135deg,#0f172a,#164e63);
+.hidden {display:none!important}
+header {
+  background:linear-gradient(120deg,#10243a,#164e78);
   color:white;
-  padding:20px 24px;
-  box-shadow:0 3px 12px #0002
+  padding:20px 15px;
+  text-align:center;
 }
-.header-top{
+header h1 {margin:0;font-size:25px}
+header h2 {margin:7px 0;font-size:18px;font-weight:600}
+header p {margin:5px 0;font-size:13px;color:#dbeafe}
+.statusbar {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:9px;
+  margin-top:13px;
+}
+.status-pill {
+  background:#ffffff1c;
+  border:1px solid #ffffff40;
+  border-radius:20px;
+  padding:6px 12px;
+  font-size:12px;
+}
+.status-dot {
+  display:inline-block;
+  width:8px;height:8px;
+  border-radius:50%;
+  margin-right:5px;
+  background:#94a3b8;
+}
+.dot-green {background:#22c55e}
+.dot-red {background:#ef4444}
+.dot-yellow {background:#facc15}
+main {max-width:1250px;margin:auto;padding:15px}
+
+.navbar {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+  margin:15px 0;
+}
+.nav-btn {
+  border:1px solid var(--border);
+  background:white;
+  color:var(--navy);
+  border-radius:8px;
+  padding:10px 17px;
+  font-weight:600;
+  cursor:pointer;
+}
+.nav-btn.active {
+  background:var(--blue);
+  color:white;
+  border-color:var(--blue);
+}
+.page-section {
+  background:white;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 2px 10px #0f172a0b;
+}
+.section-title {
+  margin:0 0 14px;
+  font-size:19px;
+  color:var(--navy);
+}
+.feeder-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(245px,1fr));
+  gap:12px;
+}
+.feeder-card {
+  border:1px solid var(--border);
+  border-left:5px solid #94a3b8;
+  border-radius:10px;
+  padding:13px;
+  background:#fff;
+}
+.feeder-card.on {border-left-color:var(--green)}
+.feeder-card.off {border-left-color:var(--red)}
+.feeder-top {
   display:flex;
   justify-content:space-between;
   align-items:center;
-  flex-wrap:wrap;
-  gap:15px
+  gap:8px;
 }
-.header-title h1{margin:0;font-size:25px}
-.header-title p{margin:7px 0 0;color:#cbd5e1;font-size:14px}
-.header-info{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:18px
+.feeder-name {font-weight:700;font-size:16px}
+.state {
+  font-size:12px;
+  font-weight:700;
+  padding:5px 10px;
+  border-radius:20px;
+  color:white;
 }
-.info-card{
-  background:#ffffff14;
-  border:1px solid #ffffff25;
-  padding:10px 14px;
-  border-radius:9px;
-  min-width:145px
-}
-.info-label{
-  font-size:11px;
-  color:#cbd5e1;
-  display:block;
-  margin-bottom:6px
-}
-.info-value{font-size:13px;font-weight:bold}
-.substation-connected{color:#4ade80}
-.substation-disconnected{color:#f87171}
-.firebase-online{color:#4ade80}
-.firebase-offline{color:#f87171}
-
-nav{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-  padding:15px;
-  background:white;
-  box-shadow:0 2px 6px #0000000d
-}
-nav button{
-  border:0;
-  padding:11px 22px;
-  border-radius:8px;
-  background:#e2e8f0;
+.state.on {background:var(--green)}
+.state.off {background:var(--red)}
+.area-list {
+  font-size:12px;
+  line-height:1.55;
   color:#334155;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:13px
+  margin-top:7px;
+  font-weight:500;
 }
-nav button.active{background:#0f766e;color:white}
-nav button:hover{background:#0d9488;color:white}
+.area-line {display:block;margin:0;padding:0}
+.last-change {font-size:11px;color:var(--muted);margin-top:8px}
 
-.container{max-width:1500px;margin:auto;padding:20px}
-.section{display:none}
-.section.active{display:block}
-.section-title{
-  font-size:20px;
-  margin:0 0 18px;
-  color:#0f172a
-}
-.summary-grid{
+.summary-grid {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:13px;
-  margin-bottom:20px
+  gap:10px;
+  margin-bottom:15px;
 }
-.summary-card{
-  background:white;
-  border-radius:10px;
-  padding:16px;
-  box-shadow:0 2px 8px #0000000c;
-  border-left:4px solid #0d9488
+.summary-card {
+  background:#f8fafc;
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:13px;
+  text-align:center;
 }
-.summary-card small{color:#64748b;font-size:12px}
-.summary-card h2{margin:8px 0 0;font-size:25px}
-.feeder-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-  gap:14px
-}
-.feeder-card{
-  background:white;
-  border-radius:11px;
-  padding:15px;
-  box-shadow:0 2px 8px #0000000c;
-  border-left:5px solid #94a3b8
-}
-.feeder-card.on{border-left-color:#16a34a}
-.feeder-card.off{border-left-color:#dc2626}
+.summary-card .number {font-size:25px;font-weight:700}
+.summary-card .label {font-size:12px;color:var(--muted);margin-top:4px}
 
-/* NEW: DISCONNECTED FEEDER GREY STYLE */
-.feeder-card.disconnected{
-  border-left-color:#9ca3af;
-  background:#e5e7eb;
-  box-shadow:none;
-}
-.feeder-card.disconnected .feeder-name,
-.feeder-card.disconnected .area-list,
-.feeder-card.disconnected .last-change{
-  color:#6b7280;
-}
-.feeder-card.disconnected .status-pill{
-  background:#d1d5db;
-  color:#4b5563;
-}
-
-.feeder-head{
+.sld-wrap {overflow-x:auto;padding:8px 0}
+.sld {
+  min-width:650px;
   display:flex;
-  justify-content:space-between;
+  flex-direction:column;
   align-items:center;
-  gap:8px
+  padding:10px;
 }
-.feeder-name{font-weight:bold;font-size:16px}
-.status-pill{
-  padding:5px 11px;
-  border-radius:20px;
+.sld-box {
+  border:2px solid #64748b;
+  border-radius:7px;
+  padding:10px 20px;
+  text-align:center;
+  min-width:180px;
+  background:#f8fafc;
+  font-weight:700;
+  font-size:13px;
+}
+.sld-line {width:3px;height:25px;background:#64748b}
+.sld-bus {
+  width:90%;
+  height:7px;
+  border-radius:5px;
+  background:#64748b;
+  margin:0 auto;
+}
+.sld-feeders {
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:5px;
+}
+.sld-branch {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.branch-line {width:3px;height:25px;background:#64748b}
+.branch-box {
+  width:100%;
+  text-align:center;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:7px 2px;
   font-size:11px;
-  font-weight:bold
+  font-weight:700;
 }
-.status-on{background:#dcfce7;color:#166534}
-.status-off{background:#fee2e2;color:#991b1b}
-.area-list{
-  font-size:12px;
-  line-height:1.8;
-  color:#64748b;
-  margin-top:10px;
-  overflow-wrap:anywhere
+.branch-box.on {
+  background:#dcfce7;
+  border-color:#22c55e;
+  color:#166534;
 }
-.last-change{
-  margin-top:9px;
-  font-size:11px;
-  color:#94a3b8
-}
-.panel{
-  background:white;
-  border-radius:11px;
-  padding:18px;
-  margin-bottom:18px;
-  box-shadow:0 2px 8px #0000000c
-}
-.panel h3{margin:0 0 15px;font-size:16px}
-.sld-wrap{overflow-x:auto}
-.sld-wrap svg{min-width:700px;width:100%;height:auto}
-.sld-label{font-family:Arial,sans-serif;font-size:13px;fill:#334155}
-.sld-line{stroke:#64748b;stroke-width:3;fill:none}
-.sld-live{stroke:#16a34a;stroke-width:4;fill:none}
-.sld-off{stroke:#dc2626;stroke-width:3;fill:none}
-.sld-box{fill:#f8fafc;stroke:#64748b;stroke-width:2}
-.sld-transformer{fill:#fef3c7;stroke:#d97706;stroke-width:2}
-
-/* NEW: DISCONNECTED SLD GREY STYLE */
-.sld-disconnected{
-  stroke:#9ca3af !important;
-  fill:#e5e7eb !important;
-}
-.sld-disconnected-text{
-  fill:#6b7280 !important;
+.branch-box.off {
+  background:#fee2e2;
+  border-color:#ef4444;
+  color:#991b1b;
 }
 
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:600px}
-th,td{
-  text-align:left;
-  padding:11px 12px;
-  border-bottom:1px solid #e2e8f0;
-  font-size:12px
-}
-th{background:#f1f5f9;color:#475569}
-tr:hover td{background:#f8fafc}
-.filter-row{
+.filter-row {
   display:flex;
   flex-wrap:wrap;
   align-items:end;
-  gap:12px;
-  margin-bottom:15px
+  gap:10px;
+  margin-bottom:14px;
 }
-.filter-row label{font-size:12px;color:#64748b}
-.filter-row input{
+.filter-row label {font-size:12px;color:var(--muted)}
+.filter-row input {
   display:block;
-  padding:9px;
-  border:1px solid #cbd5e1;
+  padding:8px;
+  border:1px solid var(--border);
   border-radius:7px;
-  margin-top:5px
+  margin-top:4px;
 }
-.action-btn{
-  border:0;
-  background:#0f766e;
+.primary-btn {
+  background:var(--blue);
   color:white;
-  padding:10px 16px;
-  border-radius:7px;
+  border:0;
+  padding:9px 16px;
+  border-radius:8px;
   cursor:pointer;
-  font-weight:bold
 }
-.action-btn.secondary{background:#64748b}
-.chart-grid{
+.primary-btn:hover {opacity:.9}
+
+table {width:100%;border-collapse:collapse;font-size:13px}
+th,td {
+  padding:10px 8px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+}
+th {background:#f1f5f9;color:var(--navy)}
+.table-wrap {overflow-x:auto}
+.event-on {color:var(--green);font-weight:700}
+.event-off {color:var(--red);font-weight:700}
+
+.chart-grid {
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:16px
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:15px;
 }
-.chart-box{
-  background:white;
-  border-radius:10px;
-  padding:18px;
-  min-height:300px;
-  box-shadow:0 2px 8px #0000000c
-}
-.chart-box h3{font-size:15px;margin:0 0 15px}
-.warning{
-  display:none;
-  background:#fef3c7;
-  color:#92400e;
-  border:1px solid #fcd34d;
-  padding:11px 14px;
-  border-radius:8px;
-  margin-bottom:15px;
-  font-size:12px
-}
-.error{
-  display:none;
-  background:#fee2e2;
-  color:#991b1b;
+.chart-card {
+  border:1px solid var(--border);
   padding:12px;
+  border-radius:9px;
+  min-height:280px;
+}
+.chart-card h3 {font-size:14px;margin:0 0 10px}
+
+.warning {
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  color:#9a3412;
   border-radius:8px;
-  margin-bottom:15px;
-  font-size:12px
+  padding:10px 12px;
+  font-size:12px;
+  margin:10px 0;
 }
-.empty{text-align:center;color:#94a3b8;padding:25px}
-footer{
+.error-message {
+  background:#fef2f2;
+  border:1px solid #fecaca;
+  color:#991b1b;
+  border-radius:8px;
+  padding:10px 12px;
+  font-size:12px;
+  margin:10px 0;
+}
+footer {
   text-align:center;
-  padding:20px;
-  font-size:11px;
-  color:#94a3b8
+  color:var(--muted);
+  padding:20px 10px;
+  font-size:12px;
 }
-@media(max-width:600px){
-  header{padding:16px}
-  .header-title h1{font-size:21px}
-  .container{padding:12px}
-  nav button{flex:1;padding:11px 8px;font-size:11px}
+
+@media(max-width:600px) {
+  header h1 {font-size:21px}
+  header h2 {font-size:15px}
+  main {padding:9px}
+  .page-section {padding:11px}
+  .nav-btn {padding:9px 11px;font-size:12px}
+  th,td {padding:8px 6px}
 }
 </style>
 </head>
@@ -271,250 +297,199 @@ footer{
 <body>
 
 <header>
-  <div class="header-top">
-    <div class="header-title">
-      <h1>Kishoreganj PBS</h1>
-      <p>Kishoreganj-1 (HQ) 20 MVA Substation</p>
-    </div>
-    <div class="info-card">
-      <span class="info-label">BANGLADESH STANDARD TIME</span>
-      <span class="info-value" id="liveClock">Loading...</span>
-    </div>
-  </div>
+  <h1>Kishoreganj PBS</h1>
+  <h2>Kishoreganj-1 (HQ) 20 MVA Substation</h2>
+  <p>Live Feeder Monitoring System</p>
 
-  <div class="header-info">
-    <div class="info-card">
-      <span class="info-label">LAST UPDATE</span>
-      <span class="info-value" id="lastUpdate">Waiting for data...</span>
-    </div>
+  <div class="statusbar">
+    <span class="status-pill">
+      <span id="internetDot" class="status-dot"></span>
+      <span id="internetStatus">Checking internet...</span>
+    </span>
 
-    <div class="info-card">
-      <span class="info-label">LAST EVENT</span>
-      <span class="info-value" id="lastEvent">No event received</span>
-    </div>
+    <span class="status-pill">
+      <span id="firebaseDot" class="status-dot"></span>
+      <span id="firebaseStatus">Firebase connecting...</span>
+    </span>
 
-    <div class="info-card">
-      <span class="info-label">SUBSTATION STATUS</span>
-      <span class="info-value substation-disconnected"
-            id="substationStatus">● CHECKING...</span>
-    </div>
+    <span class="status-pill">
+      Time: <span id="clock">--:--:--</span>
+    </span>
 
-    <div class="info-card">
-      <span class="info-label">FIREBASE CONNECTION</span>
-      <span class="info-value firebase-offline"
-            id="firebaseStatus">● CONNECTING...</span>
-    </div>
+    <span class="status-pill">
+      Last Update: <span id="lastUpdate">Waiting...</span>
+    </span>
   </div>
 </header>
 
-<nav>
-  <button class="active" onclick="showSection('mapSection',this)">
-    Feeder Map
-  </button>
-  <button onclick="showSection('sldSection',this)">
-    Single Line Diagram
-  </button>
-  <button onclick="showSection('historySection',this)">
-    Event History & Analysis
-  </button>
-</nav>
+<main>
 
-<div class="container">
-
-  <div id="offlineWarning" class="warning">
-    ⚠ Internet/Firebase connection lost. Showing the last received data.
-    The dashboard will reconnect automatically.
-  </div>
-
-  <div id="firebaseError" class="error"></div>
-
-  <!-- FEEDER MAP -->
-  <section id="mapSection" class="section active">
-
-    <h2 class="section-title">33/11 kV Feeder Status</h2>
-
-    <div class="summary-grid">
-      <div class="summary-card">
-        <small>Total Feeders</small>
-        <h2 id="totalFeeders">8</h2>
-      </div>
-      <div class="summary-card">
-        <small>Feeders ON</small>
-        <h2 id="onFeeders" style="color:#16a34a">0</h2>
-      </div>
-      <div class="summary-card">
-        <small>Feeders OFF</small>
-        <h2 id="offFeeders" style="color:#dc2626">0</h2>
-      </div>
-      <div class="summary-card">
-        <small>Availability</small>
-        <h2 id="availability">0%</h2>
-      </div>
-    </div>
-
-    <div class="feeder-grid" id="feederGrid"></div>
-  </section>
-
-  <!-- SINGLE LINE DIAGRAM -->
-  <section id="sldSection" class="section">
-
-    <h2 class="section-title">33/11 kV Substation Single Line Diagram</h2>
-
-    <div class="panel">
-      <div class="sld-wrap">
-        <svg viewBox="0 0 900 560" id="sldSvg">
-
-          <text x="450" y="28" text-anchor="middle"
-                class="sld-label" style="font-weight:bold;font-size:17px">
-            KISHOREGANJ-1 (HQ) 20 MVA SUBSTATION
-          </text>
-
-          <text x="450" y="65" text-anchor="middle" class="sld-label">
-            33 kV INCOMING
-          </text>
-
-          <line id="incomingLine" x1="450" y1="80" x2="450" y2="150"
-                class="sld-off"/>
-
-          <rect id="sldVcb" x="420" y="105" width="60" height="28" rx="4"
-                class="sld-box"/>
-          <text x="450" y="123" text-anchor="middle" class="sld-label">
-            VCB
-          </text>
-
-          <line id="transformerLine" x1="450" y1="150" x2="450" y2="195"
-                class="sld-off"/>
-
-          <rect id="sldTransformer" x="390" y="195" width="120" height="65"
-                rx="8" class="sld-transformer"/>
-          <text x="450" y="221" text-anchor="middle" class="sld-label">
-            POWER TRANSFORMER
-          </text>
-          <text x="450" y="242" text-anchor="middle" class="sld-label">
-            33/11 kV - 20 MVA
-          </text>
-
-          <line id="busFeed" x1="450" y1="260" x2="450" y2="310"
-                class="sld-off"/>
-
-          <line id="busbar" x1="90" y1="310" x2="810" y2="310"
-                class="sld-off" style="stroke-width:7"/>
-
-          <text x="450" y="295" text-anchor="middle" class="sld-label">
-            11 kV BUSBAR
-          </text>
-
-          <g id="sldFeeders"></g>
-
-          <text x="450" y="535" text-anchor="middle"
-                class="sld-label">
-            Feeder status is based on ESP32 input signals
-          </text>
-
-        </svg>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h3>SLD Status Information</h3>
-      <p style="font-size:12px;color:#64748b;line-height:1.8">
-        Green: Feeder ON &nbsp; | &nbsp;
-        Red: Feeder OFF &nbsp; | &nbsp;
-        Grey: Substation Disconnected
-        <br>
-        Incoming, transformer and busbar coloring is illustrative:
-        it indicates whether at least one feeder is ON. It is not an
-        independent breaker or voltage measurement.
-      </p>
-    </div>
-  </section>
-
-  <!-- EVENT HISTORY -->
-  <section id="historySection" class="section">
-
-    <h2 class="section-title">Event History & Analysis</h2>
-
-    <div class="panel">
-      <h3>Event Date Filter</h3>
-
-      <div class="filter-row">
-        <label>
-          From Date
-          <input type="date" id="fromDate">
-        </label>
-
-        <label>
-          To Date
-          <input type="date" id="toDate">
-        </label>
-
-        <button class="action-btn" onclick="applyFilters()">
-          Apply Filter
-        </button>
-
-        <button class="action-btn secondary" onclick="clearFilters()">
-          Clear Filter
-        </button>
-      </div>
-
-      <div class="summary-grid">
-        <div class="summary-card">
-          <small>Total Events</small>
-          <h2 id="totalEvents">0</h2>
-        </div>
-        <div class="summary-card">
-          <small>Interruption Events</small>
-          <h2 id="totalInterruptions">0</h2>
-        </div>
-        <div class="summary-card">
-          <small>Total Interruption Duration</small>
-          <h2 id="totalDuration">0.00 h</h2>
-        </div>
-      </div>
-    </div>
-
-    <div class="chart-grid">
-      <div class="chart-box">
-        <h3>Feeder-wise Interruption Count</h3>
-        <canvas id="countChart"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3>Feeder-wise Interruption Duration (Hours)</h3>
-        <canvas id="durationChart"></canvas>
-      </div>
-    </div>
-
-    <div class="panel" style="margin-top:18px">
-      <h3>Event History Table</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>SL</th>
-              <th>Date & Time</th>
-              <th>Feeder</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="eventTable">
-            <tr><td colspan="4" class="empty">Waiting for events...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </section>
-
+<div id="staleWarning" class="warning hidden">
+  Internet connection is unavailable. Showing the last saved data.
+  Live monitoring will resume automatically after reconnection.
 </div>
 
+<div id="firebaseError" class="error-message hidden"></div>
+
+<div class="navbar">
+  <button class="nav-btn active" data-section="mapSection">
+    Feeder Map
+  </button>
+
+  <button class="nav-btn" data-section="sldSection">
+    Single Line Diagram
+  </button>
+
+  <button class="nav-btn" data-section="historySection">
+    Event History
+  </button>
+</div>
+
+<section id="mapSection" class="page-section">
+  <h2 class="section-title">Feeder Status & Service Areas</h2>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="number" id="totalFeeders">8</div>
+      <div class="label">Total Feeders</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="number" id="onCount" style="color:#15803d">0</div>
+      <div class="label">Feeders ON</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="number" id="offCount" style="color:#dc2626">0</div>
+      <div class="label">Feeders OFF</div>
+    </div>
+  </div>
+
+  <div id="feederGrid" class="feeder-grid"></div>
+</section>
+
+<section id="sldSection" class="page-section hidden">
+  <h2 class="section-title">33/11 kV Single Line Diagram</h2>
+
+  <div class="sld-wrap">
+    <div class="sld">
+      <div class="sld-box" id="incomingBox">
+        33 kV Incoming Supply
+      </div>
+
+      <div class="sld-line"></div>
+
+      <div class="sld-box" id="transformerBox">
+        20 MVA Power Transformer<br>33/11 kV
+      </div>
+
+      <div class="sld-line"></div>
+
+      <div class="sld-box" id="busBox">
+        11 kV Busbar
+      </div>
+
+      <div class="sld-line" style="height:20px"></div>
+      <div class="sld-bus"></div>
+      <div class="sld-feeders" id="sldFeeders"></div>
+    </div>
+  </div>
+
+  <p style="font-size:11px;color:#64748b;text-align:center">
+    Green indicates feeder ON; red indicates feeder OFF.
+    Incoming and transformer indication is illustrative and is not
+    an independent breaker-status measurement.
+  </p>
+</section>
+
+<section id="historySection" class="page-section hidden">
+  <h2 class="section-title">Feeder Event History & Analysis</h2>
+
+  <div class="filter-row">
+    <label>
+      From Date
+      <input type="date" id="startDate">
+    </label>
+
+    <label>
+      To Date
+      <input type="date" id="endDate">
+    </label>
+
+    <button class="primary-btn" id="filterButton">
+      Apply Filter
+    </button>
+
+    <button class="primary-btn" id="resetButton" style="background:#64748b">
+      Reset
+    </button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="number" id="eventTotal">0</div>
+      <div class="label">Total Events</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="number" id="interruptionTotal">0</div>
+      <div class="label">OFF Events</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="number" id="durationTotal">0.00</div>
+      <div class="label">Interruption Hours</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Date & Time</th>
+          <th>Feeder</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody id="eventTable">
+        <tr>
+          <td colspan="3" style="text-align:center">
+            Waiting for Firebase data...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="section-title" style="margin-top:25px">
+    Feeder-wise Analysis
+  </h2>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Interruption Count by Feeder</h3>
+      <canvas id="countChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Interruption Duration (Hours)</h3>
+      <canvas id="durationChart"></canvas>
+    </div>
+  </div>
+</section>
+
+</main>
+
 <footer>
-  Kishoreganj Palli Bidyut Samity | Substation Live Monitoring System
+  Kishoreganj Palli Bidyut Samity |
+  Substation Live Monitoring
 </footer>
 
 <script type="module">
 
 import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
   getDatabase,
@@ -522,7 +497,10 @@ import {
   onValue
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-/* FIREBASE CONFIGURATION */
+
+/* ==========================================
+   FIREBASE CONFIGURATION
+========================================== */
 
 const firebaseConfig = {
   apiKey: "AIzaSyCHUJB83o2CzwGHEN-JnPXJW5RZZRfh-DA",
@@ -538,13 +516,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-/* FEEDER SERVICE AREAS */
+
+/* ==========================================
+   FEEDER SERVICE AREAS
+========================================== */
 
 const feederAreas = {
   "Feeder-1": [
     "মুকসেদপুর",
     "নতুন পল্লী"
   ],
+
   "Feeder-2": [
     "তেরহাসিয়া, পুটিপাড়া, বৌলাইবাজার",
     "দঃরাজকুন্তি, উঃরাজকুন্তি, পাঠানপাড়া, নাকভাঙ্গা, জাল্লাবাদ",
@@ -557,6 +539,7 @@ const feederAreas = {
     "নয়াপাড়া, গাবতলি, সালজান",
     "গড়ানিয়ারপাড়, ডিগ্রিকান্দা"
   ],
+
   "Feeder-3": [
     "মুকসেদপুর, কাশুয়ারচর, মহিনন্দ আগপাড়া",
     "নয়াপাড়া, বাটুয়ারপাড়, নীলগঞ্জ বাজার",
@@ -577,6 +560,7 @@ const feederAreas = {
     "ভাসানিপাড়া",
     "ভাসানিপাড়া, ইসলামপুর, মিলনগঞ্জবাজার"
   ],
+
   "Feeder-4": [
     "কাটাবাড়িয়া",
     "বড়ভাগ",
@@ -585,696 +569,722 @@ const feederAreas = {
     "সাদুল্লাহ",
     "ব্রাহ্মনকচুরী"
   ],
+
   "Feeder-5": [
     "সগড়া, রশিদাবাদ, লতিবপুর, শ্রীমন্তপুর, বারতোপা",
     "লতিবপুর, শ্রীমন্তপুর",
     "বারতোপা, শিমুলিয়া, কাকতৈল, ছফিলা, রামদিয়া"
   ],
+
   "Feeder-6": [
     "মুকসেদপুর, লতিবাবাদ, পাবইকান্দি, লক্ষীগঞ্জ, বেরুয়াইল",
     "সগড়া, রশিদাবাদ, কাকতৈল, ভূইয়াবাড়ি",
     "ঝাটাসিড়া, খিলপাড়া, পাঠানকান্দি, কাতিয়ারচর",
     "প্যারাভাঙ্গা, কুট্রাগড়, দনাইল"
   ],
+
   "Feeder-7": [
     "মুকসেদপুর, পাসপোর্ট অফিস"
   ],
+
   "Feeder-8": [
     "মুকসেদপুর, খিরদাবাজার, ভদ্রপাড়া, কলাপাড়া, বাদেশোলাকিয়া, হাজরাদী, রগুখালী, বৌলাই",
     "চং শোলাকিয়া, গাংগাইল"
   ]
 };
 
+
 const feederNames = Object.keys(feederAreas);
 
 let feederData = {};
-let eventData = [];
-let filteredEvents = [];
-let substationLastSeen = 0;
-let firebaseConnected = false;
+let allEvents = {};
+
 let countChart = null;
 let durationChart = null;
 
-const FEEDER_CACHE = "kpbshq_feeder_cache";
-const EVENT_CACHE = "kpbshq_event_cache";
+let lastDataTime = null;
+let databaseConnected = false;
 
-/* TIME FUNCTIONS */
+let lastFeederSnapshot = null;
+let lastEventSnapshot = null;
 
-function bdTime(timestamp) {
-  if (!timestamp) return "N/A";
 
-  const date = new Date(Number(timestamp) * 1000);
+/* ==========================================
+   LOCAL CACHE
+   Retains the last received data in this browser.
+========================================== */
 
-  return date.toLocaleString("en-GB", {
-    timeZone: "Asia/Dhaka",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true
-  });
+const CACHE_FEEDERS = "kpbshq_feeder_cache";
+const CACHE_EVENTS = "kpbshq_event_cache";
+
+function loadCache(key) {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : null;
+  } catch (error) {
+    console.warn("Cache reading error:",error);
+    return null;
+  }
+}
+
+function saveCache(key,data) {
+  try {
+    localStorage.setItem(key,JSON.stringify(data));
+  } catch (error) {
+    console.warn("Cache saving error:",error);
+  }
+}
+
+feederData = loadCache(CACHE_FEEDERS) || {};
+allEvents = loadCache(CACHE_EVENTS) || {};
+
+
+/* ==========================================
+   COMMON FUNCTIONS
+========================================== */
+
+const $ = id => document.getElementById(id);
+
+function localDateString(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone:"Asia/Dhaka",
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit"
+  }).formatToParts(date);
+
+  const obj = Object.fromEntries(
+    parts.map(p => [p.type,p.value])
+  );
+
+  return `${obj.year}-${obj.month}-${obj.day}`;
+}
+
+function bdTime(date = new Date()) {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone:"Asia/Dhaka",
+    day:"2-digit",
+    month:"short",
+    year:"numeric",
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit",
+    hour12:true
+  }).format(date);
 }
 
 function updateClock() {
-  document.getElementById("liveClock").textContent =
-    new Date().toLocaleString("en-GB", {
-      timeZone: "Asia/Dhaka",
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true
-    });
+  $("clock").textContent = new Intl.DateTimeFormat("en-GB", {
+    timeZone:"Asia/Dhaka",
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit",
+    hour12:true
+  }).format(new Date());
 }
 
-setInterval(updateClock, 1000);
+setInterval(updateClock,1000);
 updateClock();
 
-/* NAVIGATION */
 
-window.showSection = function(sectionId, button) {
-  document.querySelectorAll(".section").forEach(section => {
-    section.classList.remove("active");
-  });
-
-  document.getElementById(sectionId).classList.add("active");
-
-  document.querySelectorAll("nav button").forEach(btn => {
-    btn.classList.remove("active");
-  });
-
-  button.classList.add("active");
-};
-
-/* FIREBASE CONNECTION STATUS */
-
-function updateFirebaseStatus() {
-  const element = document.getElementById("firebaseStatus");
-  const warning = document.getElementById("offlineWarning");
-
-  if (firebaseConnected) {
-    element.textContent = "● CONNECTED";
-    element.className = "info-value firebase-online";
-    warning.style.display = "none";
-  } else {
-    element.textContent = "● DISCONNECTED";
-    element.className = "info-value firebase-offline";
-    warning.style.display = "block";
-  }
+function markDataReceived() {
+  lastDataTime = new Date();
+  $("lastUpdate").textContent = bdTime(lastDataTime);
 }
 
-onValue(ref(db, ".info/connected"), snapshot => {
-  firebaseConnected = snapshot.val() === true;
-  updateFirebaseStatus();
-});
 
-/* SUBSTATION HEARTBEAT STATUS */
+function updateConnectionDisplay() {
+  const online = navigator.onLine;
 
-function isSubstationConnected() {
-  return (
-    substationLastSeen > 0 &&
-    (Date.now() - substationLastSeen * 1000) < 45000
+  $("internetDot").className =
+    "status-dot " + (online ? "dot-green" : "dot-red");
+
+  $("internetStatus").textContent =
+    online ? "Internet Online" : "Internet Offline";
+
+  $("firebaseDot").className =
+    "status-dot " +
+    (databaseConnected ? "dot-green" :
+    (online ? "dot-yellow" : "dot-red"));
+
+  $("firebaseStatus").textContent =
+    databaseConnected ? "Firebase Connected" :
+    (online ? "Firebase Reconnecting..." : "Firebase Offline");
+
+  $("staleWarning").classList.toggle(
+    "hidden",
+    online && databaseConnected
   );
 }
 
-function updateSubstationStatus() {
-  const element = document.getElementById("substationStatus");
+window.addEventListener("online",updateConnectionDisplay);
+window.addEventListener("offline",updateConnectionDisplay);
 
-  if (isSubstationConnected()) {
-    element.textContent = "● SUBSTATION CONNECTED";
-    element.className = "info-value substation-connected";
-  } else {
-    element.textContent = "● SUBSTATION DISCONNECTED";
-    element.className = "info-value substation-disconnected";
-  }
 
-  // NEW: Refresh all feeder and SLD colours whenever connection changes.
-  renderFeeders();
-}
+/* ==========================================
+   NAVIGATION
+========================================== */
 
-onValue(ref(db, "Substation/Meta/lastSeen"), snapshot => {
-  substationLastSeen = Number(snapshot.val()) || 0;
-  updateSubstationStatus();
+document.querySelectorAll(".nav-btn").forEach(button => {
+
+  button.addEventListener("click",() => {
+
+    document.querySelectorAll(".nav-btn").forEach(b =>
+      b.classList.remove("active")
+    );
+
+    button.classList.add("active");
+
+    document.querySelectorAll(".page-section").forEach(section =>
+      section.classList.add("hidden")
+    );
+
+    $(button.dataset.section).classList.remove("hidden");
+
+  });
+
 });
 
-setInterval(updateSubstationStatus, 5000);
 
-/* LAST UPDATE */
-
-function markDataReceived() {
-  document.getElementById("lastUpdate").textContent =
-    new Date().toLocaleTimeString("en-GB", {
-      timeZone: "Asia/Dhaka",
-      hour12: true
-    });
-}
-
-/* STATUS NORMALIZATION */
-
-function isFeederOn(value) {
-  if (value === true || value === 1) return true;
-
-  const text = String(value ?? "").trim().toUpperCase();
-
-  return ["ON", "HIGH", "TRUE", "1"].includes(text);
-}
-
-function getStatus(value) {
-  return isFeederOn(value) ? "ON" : "OFF";
-}
-
-/* FEEDER MAP */
+/* ==========================================
+   FEEDER MAP
+========================================== */
 
 function renderFeeders() {
-  const grid = document.getElementById("feederGrid");
-  if (!grid) return;
 
+  let on = 0;
+  let off = 0;
+
+  const grid = $("feederGrid");
   grid.innerHTML = "";
 
-  const substationOnline = isSubstationConnected();
-  let onCount = 0;
-
   feederNames.forEach(name => {
+
     const data = feederData[name] || {};
 
-    // NEW: If substation is disconnected, force all feeders to OFF.
-    const on = substationOnline && isFeederOn(data.Status);
+    const isOn =
+      String(data.Status || "").toUpperCase() === "ON";
 
-    if (on) onCount++;
+    if (isOn) on++;
+    else off++;
 
     const card = document.createElement("div");
+    card.className = "feeder-card " + (isOn ? "on" : "off");
 
-    card.className = "feeder-card " +
-      (!substationOnline ? "disconnected" : (on ? "on" : "off"));
+    const top = document.createElement("div");
+    top.className = "feeder-top";
 
-    const head = document.createElement("div");
-    head.className = "feeder-head";
+    const title = document.createElement("span");
+    title.className = "feeder-name";
+    title.textContent = name;
 
-    const feederTitle = document.createElement("span");
-    feederTitle.className = "feeder-name";
-    feederTitle.textContent = name;
+    const state = document.createElement("span");
+    state.className = "state " + (isOn ? "on" : "off");
+    state.textContent = isOn ? "ON" : "OFF";
 
-    const pill = document.createElement("span");
-
-    if (!substationOnline) {
-      pill.className = "status-pill";
-      pill.textContent = "● OFF";
-    } else {
-      pill.className = "status-pill " +
-        (on ? "status-on" : "status-off");
-      pill.textContent = on ? "● ON" : "● OFF";
-    }
-
-    head.append(feederTitle, pill);
+    top.append(title,state);
 
     const areas = document.createElement("div");
     areas.className = "area-list";
-    areas.textContent = feederAreas[name].join(" | ");
 
-    const lastChange = document.createElement("div");
-    lastChange.className = "last-change";
+    feederAreas[name].forEach(area => {
 
-    lastChange.textContent = !substationOnline
-      ? "Substation Disconnected"
-      : "Last Change: " + (data.LastChange || "N/A");
+      const line = document.createElement("span");
+      line.className = "area-line";
+      line.textContent = area;
 
-    card.append(head, areas, lastChange);
-    grid.appendChild(card);
-  });
+      areas.appendChild(line);
 
-  const offCount = 8 - onCount;
-
-  document.getElementById("totalFeeders").textContent = 8;
-  document.getElementById("onFeeders").textContent = onCount;
-  document.getElementById("offFeeders").textContent = offCount;
-  document.getElementById("availability").textContent =
-    ((onCount / 8) * 100).toFixed(1) + "%";
-
-  // NEW: Grey out summary cards when substation is disconnected.
-  const summaryCards = document.querySelectorAll(
-    "#mapSection .summary-card"
-  );
-
-  summaryCards.forEach(card => {
-    card.style.borderLeftColor =
-      substationOnline ? "" : "#9ca3af";
-
-    card.style.background =
-      substationOnline ? "" : "#e5e7eb";
-  });
-
-  document.getElementById("onFeeders").style.color =
-    substationOnline ? "#16a34a" : "#6b7280";
-
-  document.getElementById("offFeeders").style.color =
-    substationOnline ? "#dc2626" : "#6b7280";
-
-  document.getElementById("availability").style.color =
-    substationOnline ? "" : "#6b7280";
-
-  renderSLD();
-}
-
-/* SINGLE LINE DIAGRAM */
-
-function renderSLD() {
-  const svgGroup = document.getElementById("sldFeeders");
-  if (!svgGroup) return;
-
-  svgGroup.innerHTML = "";
-
-  const substationOnline = isSubstationConnected();
-
-  const anyOn = substationOnline && feederNames.some(name =>
-    isFeederOn(feederData[name]?.Status)
-  );
-
-  const mainClass = !substationOnline
-    ? "sld-disconnected"
-    : (anyOn ? "sld-live" : "sld-off");
-
-  ["incomingLine", "transformerLine", "busFeed", "busbar"].forEach(id => {
-    document.getElementById(id).setAttribute("class", mainClass);
-  });
-
-  // Transformer and VCB also turn grey when disconnected.
-  document.getElementById("sldTransformer").setAttribute(
-    "class",
-    substationOnline ? "sld-transformer" : "sld-disconnected"
-  );
-
-  document.getElementById("sldVcb").setAttribute(
-    "class",
-    substationOnline ? "sld-box" : "sld-disconnected"
-  );
-
-  // Grey out the main SLD labels when disconnected.
-  document.querySelectorAll("#sldSvg .sld-label").forEach(label => {
-    label.classList.toggle(
-      "sld-disconnected-text",
-      !substationOnline
-    );
-  });
-
-  feederNames.forEach((name, index) => {
-    const x = 90 + index * 102.5;
-
-    const on = substationOnline &&
-      isFeederOn(feederData[name]?.Status);
-
-    const color = !substationOnline
-      ? "#9ca3af"
-      : (on ? "#16a34a" : "#dc2626");
-
-    const group = document.createElementNS(
-      "http://www.w3.org/2000/svg", "g"
-    );
-
-    const line = document.createElementNS(
-      "http://www.w3.org/2000/svg", "line"
-    );
-
-    line.setAttribute("x1", x);
-    line.setAttribute("y1", 310);
-    line.setAttribute("x2", x);
-    line.setAttribute("y2", 390);
-    line.setAttribute("stroke", color);
-    line.setAttribute("stroke-width", "4");
-
-    const breaker = document.createElementNS(
-      "http://www.w3.org/2000/svg", "rect"
-    );
-
-    breaker.setAttribute("x", x - 20);
-    breaker.setAttribute("y", 340);
-    breaker.setAttribute("width", 40);
-    breaker.setAttribute("height", 25);
-    breaker.setAttribute("rx", 4);
-    breaker.setAttribute(
-      "fill",
-      !substationOnline
-        ? "#e5e7eb"
-        : (on ? "#dcfce7" : "#fee2e2")
-    );
-    breaker.setAttribute("stroke", color);
-    breaker.setAttribute("stroke-width", "2");
-
-    const feederText = document.createElementNS(
-      "http://www.w3.org/2000/svg", "text"
-    );
-
-    feederText.setAttribute("x", x);
-    feederText.setAttribute("y", 415);
-    feederText.setAttribute("text-anchor", "middle");
-    feederText.setAttribute("class", "sld-label");
-    feederText.textContent = "F-" + (index + 1);
-
-    if (!substationOnline) {
-      feederText.classList.add("sld-disconnected-text");
-    }
-
-    const statusText = document.createElementNS(
-      "http://www.w3.org/2000/svg", "text"
-    );
-
-    statusText.setAttribute("x", x);
-    statusText.setAttribute("y", 435);
-    statusText.setAttribute("text-anchor", "middle");
-    statusText.setAttribute("font-size", "11");
-    statusText.setAttribute("fill", color);
-    statusText.textContent = on ? "ON" : "OFF";
-
-    group.append(line, breaker, feederText, statusText);
-    svgGroup.appendChild(group);
-  });
-}
-
-/* FEEDER REALTIME DATA */
-
-onValue(ref(db, "Substation/Feeders"), snapshot => {
-  const data = snapshot.val();
-
-  if (data) {
-    feederData = data;
-    localStorage.setItem(FEEDER_CACHE, JSON.stringify(data));
-    renderFeeders();
-    markDataReceived();
-  }
-}, error => handleFirebaseError(error));
-
-/* EVENT DATA */
-
-onValue(ref(db, "Substation/Events"), snapshot => {
-  const data = snapshot.val() || {};
-
-  eventData = Object.entries(data).map(([key, value]) => ({
-    id: key,
-    ...value
-  }));
-
-  eventData.sort((a, b) => getTimestamp(b) - getTimestamp(a));
-
-  localStorage.setItem(EVENT_CACHE, JSON.stringify(eventData));
-
-  renderLastEvent();
-  applyFilters();
-  markDataReceived();
-
-}, error => handleFirebaseError(error));
-
-function getTimestamp(event) {
-  if (event.Timestamp) return Number(event.Timestamp);
-
-  if (event.timestamp) return Number(event.timestamp);
-
-  if (event.DateTime) {
-    const parsed = Date.parse(event.DateTime);
-    if (!isNaN(parsed)) return parsed / 1000;
-  }
-
-  return 0;
-}
-
-function renderLastEvent() {
-  const element = document.getElementById("lastEvent");
-
-  if (!eventData.length) {
-    element.textContent = "No event received";
-    return;
-  }
-
-  const event = eventData[0];
-
-  element.textContent =
-    (event.Feeder || "Unknown") + " " +
-    getStatus(event.Status) + " | " +
-    (event.DateTime || bdTime(getTimestamp(event)));
-}
-
-/* EVENT FILTER */
-
-window.applyFilters = function() {
-  const from = document.getElementById("fromDate").value;
-  const to = document.getElementById("toDate").value;
-
-  const fromTime = from
-    ? new Date(from + "T00:00:00+06:00").getTime() / 1000
-    : 0;
-
-  const toTime = to
-    ? new Date(to + "T23:59:59+06:00").getTime() / 1000
-    : Infinity;
-
-  filteredEvents = eventData.filter(event => {
-    const time = getTimestamp(event);
-    return time >= fromTime && time <= toTime;
-  });
-
-  renderEventTable();
-  renderCharts();
-};
-
-window.clearFilters = function() {
-  document.getElementById("fromDate").value = "";
-  document.getElementById("toDate").value = "";
-  applyFilters();
-};
-
-/* EVENT TABLE */
-
-function renderEventTable() {
-  const tbody = document.getElementById("eventTable");
-  tbody.innerHTML = "";
-
-  document.getElementById("totalEvents").textContent =
-    filteredEvents.length;
-
-  if (!filteredEvents.length) {
-    tbody.innerHTML =
-      '<tr><td colspan="4" class="empty">No events found</td></tr>';
-    return;
-  }
-
-  filteredEvents.forEach((event, index) => {
-    const tr = document.createElement("tr");
-
-    const values = [
-      index + 1,
-      event.DateTime || bdTime(getTimestamp(event)),
-      event.Feeder || "Unknown",
-      getStatus(event.Status)
-    ];
-
-    values.forEach((value, i) => {
-      const td = document.createElement("td");
-      td.textContent = value;
-
-      if (i === 3) {
-        td.style.fontWeight = "bold";
-        td.style.color = value === "ON" ? "#16a34a" : "#dc2626";
-      }
-
-      tr.appendChild(td);
     });
 
-    tbody.appendChild(tr);
+    const last = document.createElement("div");
+    last.className = "last-change";
+    last.textContent =
+      "Last Change: " + (data.LastChange || "Not available");
+
+    card.append(top,areas,last);
+    grid.appendChild(card);
+
   });
+
+  $("onCount").textContent = on;
+  $("offCount").textContent = off;
+
 }
 
-/* INTERRUPTION COUNT AND DURATION */
 
-function calculateOutages() {
-  const counts = {};
-  const durations = {};
+/* ==========================================
+   SINGLE LINE DIAGRAM
+========================================== */
 
-  feederNames.forEach(name => {
-    counts[name] = 0;
-    durations[name] = 0;
-  });
+function renderSLD() {
 
-  const sorted = [...eventData].sort(
-    (a, b) => getTimestamp(a) - getTimestamp(b)
+  const statuses = feederNames.map(name =>
+    String((feederData[name] || {}).Status || "").toUpperCase() === "ON"
   );
 
-  const openOutages = {};
+  const anyOn = statuses.some(Boolean);
 
-  const from = document.getElementById("fromDate").value;
-  const to = document.getElementById("toDate").value;
-
-  const rangeStart = from
-    ? new Date(from + "T00:00:00+06:00").getTime() / 1000
-    : 0;
-
-  const rangeEnd = to
-    ? new Date(to + "T23:59:59+06:00").getTime() / 1000
-    : Date.now() / 1000;
-
-  sorted.forEach(event => {
-    const feeder = event.Feeder;
-    if (!feeder || !(feeder in counts)) return;
-
-    const timestamp = getTimestamp(event);
-    if (!timestamp) return;
-
-    const status = getStatus(event.Status);
-
-    if (status === "OFF") {
-      if (timestamp >= rangeStart && timestamp <= rangeEnd) {
-        counts[feeder]++;
-      }
-
-      if (openOutages[feeder] === undefined) {
-        openOutages[feeder] = timestamp;
-      }
-
-    } else if (status === "ON") {
-
-      if (openOutages[feeder] !== undefined) {
-        const start = openOutages[feeder];
-        const end = timestamp;
-
-        const clippedStart = Math.max(start, rangeStart);
-        const clippedEnd = Math.min(end, rangeEnd);
-
-        if (clippedEnd > clippedStart) {
-          durations[feeder] +=
-            (clippedEnd - clippedStart) / 3600;
-        }
-
-        delete openOutages[feeder];
-      }
-    }
+  ["incomingBox","transformerBox","busBox"].forEach(id => {
+    $(id).style.borderColor =
+      anyOn ? "#16a34a" : "#dc2626";
   });
 
-  Object.entries(openOutages).forEach(([feeder, start]) => {
-    const clippedStart = Math.max(start, rangeStart);
-    const clippedEnd = Math.min(Date.now() / 1000, rangeEnd);
+  const container = $("sldFeeders");
+  container.innerHTML = "";
 
-    if (clippedEnd > clippedStart) {
-      durations[feeder] +=
-        (clippedEnd - clippedStart) / 3600;
-    }
+  feederNames.forEach((name,index) => {
+
+    const branch = document.createElement("div");
+    branch.className = "sld-branch";
+
+    const line = document.createElement("div");
+    line.className = "branch-line";
+
+    const box = document.createElement("div");
+
+    box.className =
+      "branch-box " + (statuses[index] ? "on" : "off");
+
+    box.textContent =
+      name.replace("Feeder-","F") +
+      (statuses[index] ? " ON" : " OFF");
+
+    branch.append(line,box);
+    container.appendChild(branch);
+
   });
 
-  const totalInterruptions = Object.values(counts)
-    .reduce((a, b) => a + b, 0);
-
-  const totalHours = Object.values(durations)
-    .reduce((a, b) => a + b, 0);
-
-  document.getElementById("totalInterruptions").textContent =
-    totalInterruptions;
-
-  document.getElementById("totalDuration").textContent =
-    totalHours.toFixed(2) + " h";
-
-  return { counts, durations };
 }
 
-/* CHARTS */
 
-function renderCharts() {
-  const { counts, durations } = calculateOutages();
+/* ==========================================
+   EVENT HISTORY
+========================================== */
+
+function eventList() {
+
+  return Object.entries(allEvents || {}).map(([id,event]) => {
+
+    const e = event || {};
+
+    let timestamp = Number(e.Timestamp || 0);
+
+    if (timestamp > 0 && timestamp < 1000000000000) {
+      timestamp *= 1000;
+    }
+
+    if (!timestamp && e.DateTime) {
+      const parsed = new Date(e.DateTime).getTime();
+
+      if (Number.isFinite(parsed)) {
+        timestamp = parsed;
+      }
+    }
+
+    return {
+      id,
+      feeder:e.Feeder || "Unknown",
+      status:String(e.Status || "").toUpperCase(),
+      dateTime:e.DateTime || "",
+      timestamp
+    };
+
+  }).filter(e => e.timestamp > 0)
+    .sort((a,b) => a.timestamp - b.timestamp);
+
+}
+
+
+function selectedRange() {
+
+  const start = $("startDate").value;
+  const end = $("endDate").value;
+
+  const startMs = start
+    ? new Date(start + "T00:00:00+06:00").getTime()
+    : -Infinity;
+
+  const endMs = end
+    ? new Date(end + "T23:59:59.999+06:00").getTime()
+    : Infinity;
+
+  return {startMs,endMs};
+
+}
+
+
+function formatEventDate(timestamp) {
+
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone:"Asia/Dhaka",
+    day:"2-digit",
+    month:"short",
+    year:"numeric",
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit",
+    hour12:true
+  }).format(new Date(timestamp));
+
+}
+
+
+/* ==========================================
+   HISTORY TABLE AND INTERRUPTION ANALYSIS
+========================================== */
+
+function renderHistory() {
+
+  const events = eventList();
+
+  const {startMs,endMs} = selectedRange();
+
+  const filtered = events.filter(e =>
+    e.timestamp >= startMs && e.timestamp <= endMs
+  );
+
+  const tbody = $("eventTable");
+  tbody.innerHTML = "";
+
+  const newestFirst = [...filtered].reverse();
+
+  if (!newestFirst.length) {
+
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+
+    td.colSpan = 3;
+    td.style.textAlign = "center";
+    td.textContent = "No events found for this date range.";
+
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+
+  } else {
+
+    newestFirst.forEach(e => {
+
+      const tr = document.createElement("tr");
+
+      const dateCell = document.createElement("td");
+      dateCell.textContent = formatEventDate(e.timestamp);
+
+      const feederCell = document.createElement("td");
+      feederCell.textContent = e.feeder;
+
+      const statusCell = document.createElement("td");
+      statusCell.textContent = e.status;
+
+      statusCell.className =
+        e.status === "ON" ? "event-on" : "event-off";
+
+      tr.append(dateCell,feederCell,statusCell);
+      tbody.appendChild(tr);
+
+    });
+
+  }
+
+  const offEvents = filtered.filter(e => e.status === "OFF");
+
+  $("eventTotal").textContent = filtered.length;
+  $("interruptionTotal").textContent = offEvents.length;
+
+
+  /* Calculate interruption duration.
+     Includes outages that started before the selected range. */
+
+  const durationByFeeder = {};
+  const countByFeeder = {};
+
+  feederNames.forEach(name => {
+    durationByFeeder[name] = 0;
+    countByFeeder[name] = 0;
+  });
+
+  const openOutage = {};
+
+  events.forEach(e => {
+
+    if (!feederNames.includes(e.feeder)) return;
+
+    if (e.status === "OFF") {
+
+      if (e.timestamp >= startMs && e.timestamp <= endMs) {
+        countByFeeder[e.feeder]++;
+      }
+
+      if (openOutage[e.feeder] === undefined) {
+        openOutage[e.feeder] = e.timestamp;
+      }
+
+    } else if (e.status === "ON") {
+
+      const offTime = openOutage[e.feeder];
+
+      if (offTime !== undefined) {
+
+        const clippedStart = Math.max(offTime,startMs);
+        const clippedEnd = Math.min(e.timestamp,endMs);
+
+        if (clippedEnd > clippedStart) {
+          durationByFeeder[e.feeder] +=
+            (clippedEnd-clippedStart)/3600000;
+        }
+
+        delete openOutage[e.feeder];
+
+      }
+
+    }
+
+  });
+
+
+  /* Count ongoing interruptions up to now. */
+
+  const now = Date.now();
+
+  Object.entries(openOutage).forEach(([feeder,offTime]) => {
+
+    const clippedStart = Math.max(offTime,startMs);
+    const clippedEnd = Math.min(now,endMs);
+
+    if (clippedEnd > clippedStart) {
+      durationByFeeder[feeder] +=
+        (clippedEnd-clippedStart)/3600000;
+    }
+
+  });
+
+
+  const totalHours = Object.values(durationByFeeder)
+    .reduce((sum,value) => sum + value,0);
+
+  $("durationTotal").textContent = totalHours.toFixed(2);
+
+  updateCharts(countByFeeder,durationByFeeder);
+
+}
+
+
+/* ==========================================
+   CHARTS
+========================================== */
+
+function updateCharts(counts,durations) {
 
   const labels = feederNames.map(name =>
-    name.replace("Feeder-", "F-")
+    name.replace("Feeder-","F")
   );
 
   if (countChart) countChart.destroy();
   if (durationChart) durationChart.destroy();
 
-  countChart = new Chart(
-    document.getElementById("countChart"),
-    {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [{
-          label: "Interruption Count",
-          data: feederNames.map(name => counts[name]),
-          backgroundColor: "#ef4444",
-          borderRadius: 5
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-      }
-    }
-  );
+  countChart = new Chart($("countChart"), {
 
-  durationChart = new Chart(
-    document.getElementById("durationChart"),
-    {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [{
-          label: "Duration (Hours)",
-          data: feederNames.map(name =>
-            Number(durations[name].toFixed(2))
-          ),
-          backgroundColor: "#0d9488",
-          borderRadius: 5
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
+    type:"bar",
+
+    data:{
+      labels,
+      datasets:[{
+        label:"Interruption Count",
+        data:feederNames.map(name => counts[name] || 0),
+        backgroundColor:"#dc2626"
+      }]
+    },
+
+    options:{
+      responsive:true,
+      maintainAspectRatio:true,
+      scales:{
+        y:{
+          beginAtZero:true,
+          ticks:{precision:0}
+        }
       }
     }
-  );
+
+  });
+
+
+  durationChart = new Chart($("durationChart"), {
+
+    type:"bar",
+
+    data:{
+      labels,
+      datasets:[{
+        label:"Duration (Hours)",
+        data:feederNames.map(name =>
+          Number((durations[name] || 0).toFixed(2))
+        ),
+        backgroundColor:"#1769aa"
+      }]
+    },
+
+    options:{
+      responsive:true,
+      maintainAspectRatio:true,
+      scales:{
+        y:{beginAtZero:true}
+      }
+    }
+
+  });
+
 }
 
-/* FIREBASE ERROR */
+
+/* ==========================================
+   DATE FILTER
+========================================== */
+
+const today = localDateString();
+
+$("startDate").value = today;
+$("endDate").value = today;
+
+$("filterButton").addEventListener("click",renderHistory);
+
+$("resetButton").addEventListener("click",() => {
+
+  $("startDate").value = today;
+  $("endDate").value = today;
+
+  renderHistory();
+
+});
+
+
+/* ==========================================
+   FIREBASE REALTIME DATABASE
+   No Firebase Authentication required here.
+========================================== */
 
 function handleFirebaseError(error) {
-  console.error("Firebase error:", error);
 
-  const box = document.getElementById("firebaseError");
-  box.style.display = "block";
+  console.error("Firebase Database Error:",error);
 
-  if (error.code === "PERMISSION_DENIED") {
-    box.textContent =
+  const message = $("firebaseError");
+
+  message.classList.remove("hidden");
+
+  if (error.code === "PERMISSION_DENIED" ||
+      error.code === "PERMISSION_DENIED") {
+
+    message.textContent =
       "Firebase permission denied. Please check your Realtime Database read rules.";
+
   } else {
-    box.textContent =
-      "Firebase error: " + (error.message || "Unable to read database.");
+
+    message.textContent =
+      "Unable to receive Firebase data. Check internet connection and Firebase Database settings.";
+
   }
+
 }
 
-/* RESTORE LAST RECEIVED DATA FROM BROWSER CACHE */
 
-try {
-  const savedFeeders = localStorage.getItem(FEEDER_CACHE);
+onValue(ref(db,".info/connected"),snapshot => {
 
-  if (savedFeeders) {
-    feederData = JSON.parse(savedFeeders);
+  databaseConnected = snapshot.val() === true;
+
+  updateConnectionDisplay();
+
+},error => {
+
+  databaseConnected = false;
+  updateConnectionDisplay();
+  handleFirebaseError(error);
+
+});
+
+
+/* Feeder status listener */
+
+onValue(ref(db,"Substation/Feeders"),snapshot => {
+
+  const data = snapshot.val();
+
+  if (data) {
+
+    lastFeederSnapshot = data;
+    feederData = data;
+
+    saveCache(CACHE_FEEDERS,data);
+
+    markDataReceived();
+
+    $("firebaseError").classList.add("hidden");
+
     renderFeeders();
+    renderSLD();
+
   }
 
-  const savedEvents = localStorage.getItem(EVENT_CACHE);
+},error => {
 
-  if (savedEvents) {
-    eventData = JSON.parse(savedEvents);
-    eventData.sort((a, b) => getTimestamp(b) - getTimestamp(a));
-    renderLastEvent();
-    applyFilters();
+  handleFirebaseError(error);
+
+});
+
+
+/* Event history listener */
+
+onValue(ref(db,"Substation/Events"),snapshot => {
+
+  const data = snapshot.val();
+
+  if (data) {
+
+    lastEventSnapshot = data;
+    allEvents = data;
+
+    saveCache(CACHE_EVENTS,data);
+
+    markDataReceived();
+
+    $("firebaseError").classList.add("hidden");
+
+    renderHistory();
+
+  } else {
+
+    allEvents = {};
+    saveCache(CACHE_EVENTS,{});
+    markDataReceived();
+    renderHistory();
+
   }
 
-} catch (error) {
-  console.error("Cache restore error:", error);
+},error => {
+
+  handleFirebaseError(error);
+
+});
+
+
+/* ==========================================
+   INITIAL DISPLAY FROM SAVED CACHE
+========================================== */
+
+renderFeeders();
+renderSLD();
+renderHistory();
+
+updateConnectionDisplay();
+
+if (Object.keys(feederData).length ||
+    Object.keys(allEvents).length) {
+
+  $("lastUpdate").textContent = "Showing saved data";
+
 }
 
 </script>
 
 </body>
 </html>
+```
