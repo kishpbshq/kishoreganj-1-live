@@ -696,10 +696,13 @@ $("loginButton").addEventListener("click",async()=>{
     await signInWithEmailAndPassword(auth,email,password);
     $("password").value="";
     $("loginMessage").textContent="";
-  }catch(error){
-    $("loginMessage").textContent=
-      "Login failed. Please check your email and password.";
-  }finally{
+  }catch (error) {
+    console.error("Firebase Login Error:", error);
+    alert(
+        "Login failed!\nError Code: " + error.code +
+        "\nMessage: " + error.message
+    );
+}finally{
     $("loginButton").disabled=false;
   }
 });
