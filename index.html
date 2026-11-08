@@ -115,23 +115,6 @@ nav button:hover{background:#0d9488;color:white}
 }
 .feeder-card.on{border-left-color:#16a34a}
 .feeder-card.off{border-left-color:#dc2626}
-
-/* DISCONNECTED / UNKNOWN FEEDER STYLE */
-.feeder-card.disconnected{
-  border-left-color:#9ca3af;
-  background:#e5e7eb;
-  box-shadow:none;
-}
-.feeder-card.disconnected .feeder-name,
-.feeder-card.disconnected .area-list,
-.feeder-card.disconnected .last-change{
-  color:#6b7280;
-}
-.feeder-card.disconnected .status-pill{
-  background:#d1d5db;
-  color:#4b5563;
-}
-
 .feeder-head{
   display:flex;
   justify-content:space-between;
@@ -147,8 +130,6 @@ nav button:hover{background:#0d9488;color:white}
 }
 .status-on{background:#dcfce7;color:#166534}
 .status-off{background:#fee2e2;color:#991b1b}
-.status-unknown{background:#d1d5db;color:#4b5563}
-
 .area-list{
   font-size:12px;
   line-height:1.8;
@@ -177,15 +158,6 @@ nav button:hover{background:#0d9488;color:white}
 .sld-off{stroke:#dc2626;stroke-width:3;fill:none}
 .sld-box{fill:#f8fafc;stroke:#64748b;stroke-width:2}
 .sld-transformer{fill:#fef3c7;stroke:#d97706;stroke-width:2}
-
-.sld-disconnected{
-  stroke:#9ca3af !important;
-  fill:#e5e7eb !important;
-}
-.sld-disconnected-text{
-  fill:#6b7280 !important;
-}
-
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:600px}
 th,td{
@@ -344,7 +316,7 @@ footer{
         <h2 id="onFeeders" style="color:#16a34a">0</h2>
       </div>
       <div class="summary-card">
-        <small id="offFeedersLabel">Feeders OFF</small>
+        <small>Feeders OFF</small>
         <h2 id="offFeeders" style="color:#dc2626">0</h2>
       </div>
       <div class="summary-card">
@@ -377,7 +349,7 @@ footer{
           <line id="incomingLine" x1="450" y1="80" x2="450" y2="150"
                 class="sld-off"/>
 
-          <rect id="sldVcb" x="420" y="105" width="60" height="28" rx="4"
+          <rect x="420" y="105" width="60" height="28" rx="4"
                 class="sld-box"/>
           <text x="450" y="123" text-anchor="middle" class="sld-label">
             VCB
@@ -386,8 +358,8 @@ footer{
           <line id="transformerLine" x1="450" y1="150" x2="450" y2="195"
                 class="sld-off"/>
 
-          <rect id="sldTransformer" x="390" y="195" width="120" height="65"
-                rx="8" class="sld-transformer"/>
+          <rect x="390" y="195" width="120" height="65" rx="8"
+                class="sld-transformer"/>
           <text x="450" y="221" text-anchor="middle" class="sld-label">
             POWER TRANSFORMER
           </text>
@@ -420,8 +392,7 @@ footer{
       <h3>SLD Status Information</h3>
       <p style="font-size:12px;color:#64748b;line-height:1.8">
         Green: Feeder ON &nbsp; | &nbsp;
-        Red: Feeder OFF &nbsp; | &nbsp;
-        Grey: UNKNOWN / COMMUNICATION LOST
+        Red: Feeder OFF
         <br>
         Incoming, transformer and busbar coloring is illustrative:
         it indicates whether at least one feeder is ON. It is not an
@@ -695,26 +666,20 @@ onValue(ref(db, ".info/connected"), snapshot => {
 
 /* SUBSTATION HEARTBEAT STATUS */
 
-function isSubstationConnected() {
-  return (
-    firebaseConnected &&
-    substationLastSeen > 0 &&
-    (Date.now() - substationLastSeen * 1000) < 45000
-  );
-}
-
 function updateSubstationStatus() {
   const element = document.getElementById("substationStatus");
 
-  if (isSubstationConnected()) {
+  const connected =
+    substationLastSeen > 0 &&
+    (Date.now() - substationLastSeen * 1000) < 45000;
+
+  if (connected) {
     element.textContent = "● SUBSTATION CONNECTED";
     element.className = "info-value substation-connected";
   } else {
     element.textContent = "● SUBSTATION DISCONNECTED";
     element.className = "info-value substation-disconnected";
   }
-
-  renderFeeders();
 }
 
 onValue(ref(db, "Substation/Meta/lastSeen"), snapshot => {
@@ -752,35 +717,18 @@ function getStatus(value) {
 
 function renderFeeders() {
   const grid = document.getElementById("feederGrid");
-  if (!grid) return;
-
   grid.innerHTML = "";
 
-  const substationOnline = isSubstationConnected();
   let onCount = 0;
-  let offCount = 0;
-  let unknownCount = 0;
 
   feederNames.forEach(name => {
     const data = feederData[name] || {};
+    const on = isFeederOn(data.Status);
 
-    const actualOn = isFeederOn(data.Status);
-
-    // Do not report stale readings as actual OFF.
-    const status = !substationOnline
-      ? "UNKNOWN"
-      : (actualOn ? "ON" : "OFF");
-
-    if (status === "ON") onCount++;
-    else if (status === "OFF") offCount++;
-    else unknownCount++;
+    if (on) onCount++;
 
     const card = document.createElement("div");
-
-    card.className = "feeder-card " +
-      (!substationOnline
-        ? "disconnected"
-        : (actualOn ? "on" : "off"));
+    card.className = "feeder-card " + (on ? "on" : "off");
 
     const head = document.createElement("div");
     head.className = "feeder-head";
@@ -790,15 +738,8 @@ function renderFeeders() {
     feederTitle.textContent = name;
 
     const pill = document.createElement("span");
-
-    if (!substationOnline) {
-      pill.className = "status-pill status-unknown";
-      pill.textContent = "● UNKNOWN";
-    } else {
-      pill.className = "status-pill " +
-        (actualOn ? "status-on" : "status-off");
-      pill.textContent = actualOn ? "● ON" : "● OFF";
-    }
+    pill.className = "status-pill " + (on ? "status-on" : "status-off");
+    pill.textContent = on ? "● ON" : "● OFF";
 
     head.append(feederTitle, pill);
 
@@ -808,48 +749,20 @@ function renderFeeders() {
 
     const lastChange = document.createElement("div");
     lastChange.className = "last-change";
-
-    lastChange.textContent = !substationOnline
-      ? "UNKNOWN / COMMUNICATION LOST"
-      : "Last Change: " + (data.LastChange || "N/A");
+    lastChange.textContent =
+      "Last Change: " + (data.LastChange || "N/A");
 
     card.append(head, areas, lastChange);
     grid.appendChild(card);
   });
 
+  const offCount = 8 - onCount;
+
   document.getElementById("totalFeeders").textContent = 8;
   document.getElementById("onFeeders").textContent = onCount;
-  document.getElementById("offFeeders").textContent =
-    substationOnline ? offCount : unknownCount;
-
-  document.getElementById("offFeedersLabel").textContent =
-    substationOnline ? "Feeders OFF" : "Feeders UNKNOWN";
-
+  document.getElementById("offFeeders").textContent = offCount;
   document.getElementById("availability").textContent =
-    substationOnline
-      ? ((onCount / 8) * 100).toFixed(1) + "%"
-      : "UNKNOWN";
-
-  const summaryCards = document.querySelectorAll(
-    "#mapSection .summary-card"
-  );
-
-  summaryCards.forEach(card => {
-    card.style.borderLeftColor =
-      substationOnline ? "" : "#9ca3af";
-
-    card.style.background =
-      substationOnline ? "" : "#e5e7eb";
-  });
-
-  document.getElementById("onFeeders").style.color =
-    substationOnline ? "#16a34a" : "#6b7280";
-
-  document.getElementById("offFeeders").style.color =
-    substationOnline ? "#dc2626" : "#6b7280";
-
-  document.getElementById("availability").style.color =
-    substationOnline ? "" : "#6b7280";
+    ((onCount / 8) * 100).toFixed(1) + "%";
 
   renderSLD();
 }
@@ -858,50 +771,22 @@ function renderFeeders() {
 
 function renderSLD() {
   const svgGroup = document.getElementById("sldFeeders");
-  if (!svgGroup) return;
-
   svgGroup.innerHTML = "";
 
-  const substationOnline = isSubstationConnected();
-
-  const anyOn = substationOnline && feederNames.some(name =>
+  const anyOn = feederNames.some(name =>
     isFeederOn(feederData[name]?.Status)
   );
 
-  const mainClass = !substationOnline
-    ? "sld-disconnected"
-    : (anyOn ? "sld-live" : "sld-off");
+  const mainClass = anyOn ? "sld-live" : "sld-off";
 
   ["incomingLine", "transformerLine", "busFeed", "busbar"].forEach(id => {
     document.getElementById(id).setAttribute("class", mainClass);
   });
 
-  document.getElementById("sldTransformer").setAttribute(
-    "class",
-    substationOnline ? "sld-transformer" : "sld-disconnected"
-  );
-
-  document.getElementById("sldVcb").setAttribute(
-    "class",
-    substationOnline ? "sld-box" : "sld-disconnected"
-  );
-
-  document.querySelectorAll("#sldSvg .sld-label").forEach(label => {
-    label.classList.toggle(
-      "sld-disconnected-text",
-      !substationOnline
-    );
-  });
-
   feederNames.forEach((name, index) => {
     const x = 90 + index * 102.5;
-
-    const on = substationOnline &&
-      isFeederOn(feederData[name]?.Status);
-
-    const color = !substationOnline
-      ? "#9ca3af"
-      : (on ? "#16a34a" : "#dc2626");
+    const on = isFeederOn(feederData[name]?.Status);
+    const color = on ? "#16a34a" : "#dc2626";
 
     const group = document.createElementNS(
       "http://www.w3.org/2000/svg", "g"
@@ -910,7 +795,6 @@ function renderSLD() {
     const line = document.createElementNS(
       "http://www.w3.org/2000/svg", "line"
     );
-
     line.setAttribute("x1", x);
     line.setAttribute("y1", 310);
     line.setAttribute("x2", x);
@@ -921,48 +805,33 @@ function renderSLD() {
     const breaker = document.createElementNS(
       "http://www.w3.org/2000/svg", "rect"
     );
-
     breaker.setAttribute("x", x - 20);
     breaker.setAttribute("y", 340);
     breaker.setAttribute("width", 40);
     breaker.setAttribute("height", 25);
     breaker.setAttribute("rx", 4);
-
-    breaker.setAttribute(
-      "fill",
-      !substationOnline
-        ? "#e5e7eb"
-        : (on ? "#dcfce7" : "#fee2e2")
-    );
-
+    breaker.setAttribute("fill", on ? "#dcfce7" : "#fee2e2");
     breaker.setAttribute("stroke", color);
     breaker.setAttribute("stroke-width", "2");
 
     const feederText = document.createElementNS(
       "http://www.w3.org/2000/svg", "text"
     );
-
     feederText.setAttribute("x", x);
     feederText.setAttribute("y", 415);
     feederText.setAttribute("text-anchor", "middle");
     feederText.setAttribute("class", "sld-label");
     feederText.textContent = "F-" + (index + 1);
 
-    if (!substationOnline) {
-      feederText.classList.add("sld-disconnected-text");
-    }
-
     const statusText = document.createElementNS(
       "http://www.w3.org/2000/svg", "text"
     );
-
     statusText.setAttribute("x", x);
     statusText.setAttribute("y", 435);
     statusText.setAttribute("text-anchor", "middle");
-    statusText.setAttribute("font-size", "10");
+    statusText.setAttribute("font-size", "11");
     statusText.setAttribute("fill", color);
-    statusText.textContent = on ? "ON" :
-      (substationOnline ? "OFF" : "UNKNOWN");
+    statusText.textContent = on ? "ON" : "OFF";
 
     group.append(line, breaker, feederText, statusText);
     svgGroup.appendChild(group);
@@ -1166,6 +1035,8 @@ function calculateOutages() {
     }
   });
 
+  /* Include outages that are still open */
+
   Object.entries(openOutages).forEach(([feeder, start]) => {
     const clippedStart = Math.max(start, rangeStart);
     const clippedEnd = Math.min(Date.now() / 1000, rangeEnd);
@@ -1289,10 +1160,6 @@ try {
 } catch (error) {
   console.error("Cache restore error:", error);
 }
-
-/* INITIAL STATUS CHECK */
-
-updateSubstationStatus();
 
 </script>
 
