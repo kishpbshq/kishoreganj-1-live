@@ -1,0 +1,578 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kishoreganj-1 Live Monitoring</title>
+
+<!-- Firebase Styling -->
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef2f7;
+    color: #1e293b;
+}
+
+header {
+    background: #123c69;
+    color: white;
+    padding: 22px 15px;
+    text-align: center;
+}
+
+header h2 {
+    margin: 0;
+    font-size: 25px;
+}
+
+header p {
+    margin-bottom: 0;
+    color: #dbeafe;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 25px auto;
+    padding: 15px;
+}
+
+.login-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 22px;
+    box-shadow: 0 3px 12px #0001;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 7px 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+button {
+    background: #123c69;
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+button:hover {
+    background: #1e5a91;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 18px;
+}
+
+.card {
+    background: white;
+    padding: 28px 15px;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #0001;
+    border-top: 4px solid #123c69;
+}
+
+.card h3 {
+    color: #64748b;
+    font-size: 16px;
+}
+
+.value {
+    font-size: 38px;
+    font-weight: bold;
+    color: #123c69;
+    margin-top: 15px;
+}
+
+.unit {
+    font-size: 18px;
+}
+
+.status {
+    font-size: 23px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.online {
+    color: #16a34a;
+}
+
+.offline {
+    color: #dc2626;
+}
+
+.unknown {
+    color: #64748b;
+}
+
+.info {
+    background: white;
+    margin-top: 22px;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px #0001;
+}
+
+#message {
+    font-size: 14px;
+    color: #dc2626;
+}
+
+#lastUpdate {
+    color: #64748b;
+    font-size: 13px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #64748b;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>KISHOREGANJ-1</h2>
+    <p>ESP32 LIVE VOLTAGE MONITORING SYSTEM</p>
+</header>
+
+<div class="container">
+
+    <!-- Firebase Login -->
+    <div class="login-box">
+
+        <h3>Firebase Authentication</h3>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Enter Firebase Email"
+        >
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Enter Firebase Password"
+        >
+
+        <button id="loginBtn">LOGIN</button>
+
+        <button id="logoutBtn" hidden>LOGOUT</button>
+
+        <p id="message">Please login to view live data.</p>
+
+    </div>
+
+
+    <!-- Monitoring Cards -->
+    <div class="cards">
+
+        <!-- Voltage -->
+        <div class="card">
+
+            <h3>VOLTAGE</h3>
+
+            <div class="value">
+                <span id="voltage">--</span>
+                <span class="unit">V</span>
+            </div>
+
+        </div>
+
+
+        <!-- Counter -->
+        <div class="card">
+
+            <h3>COUNTER</h3>
+
+            <div class="value" id="counter">
+                --
+            </div>
+
+        </div>
+
+
+        <!-- Device Status -->
+        <div class="card">
+
+            <h3>ESP32 STATUS</h3>
+
+            <div class="status unknown" id="status">
+                UNKNOWN
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Information -->
+    <div class="info">
+
+        <h3>Monitoring Information</h3>
+
+        <p>
+            Device: <b>ESP32 DevKit V1</b>
+        </p>
+
+        <p>
+            Database: <b>Kishoreganj-1 Live</b>
+        </p>
+
+        <p id="lastUpdate">
+            Last Update: --
+        </p>
+
+        <p id="connection">
+            Firebase: Disconnected
+        </p>
+
+    </div>
+
+</div>
+
+
+<footer>
+    Kishoreganj-1 Live Monitoring System
+    <br><br>
+    Powered by ESP32 & Firebase Realtime Database
+</footer>
+
+
+<!-- Firebase JavaScript -->
+<script type="module">
+
+// Import Firebase
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+    getDatabase,
+    ref,
+    onValue
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+// ====================================
+// FIREBASE CONFIGURATION
+// ====================================
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyCHUJB83o2CzwGHEN-JnPXJW5RZRRfh-DA",
+
+    authDomain: "kishoreganj-1-live.firebaseapp.com",
+
+    databaseURL: "https://kishoreganj-1-live-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+    projectId: "kishoreganj-1-live",
+
+    storageBucket: "kishoreganj-1-live.firebasestorage.app",
+
+    messagingSenderId: "362129007391",
+
+    appId: "1:362129007391:web:f241f32c96aedf699a462a",
+
+    measurementId: "G-B4MGXFNQ8B"
+
+};
+
+
+// ====================================
+// INITIALIZE FIREBASE
+// ====================================
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const database = getDatabase(app);
+
+
+// ====================================
+// HTML ELEMENTS
+// ====================================
+
+const voltageEl = document.getElementById("voltage");
+
+const counterEl = document.getElementById("counter");
+
+const statusEl = document.getElementById("status");
+
+const messageEl = document.getElementById("message");
+
+const lastUpdateEl = document.getElementById("lastUpdate");
+
+const connectionEl = document.getElementById("connection");
+
+const loginBtn = document.getElementById("loginBtn");
+
+const logoutBtn = document.getElementById("logoutBtn");
+
+let unsubscribe = [];
+
+
+// ====================================
+// LOGIN FUNCTION
+// ====================================
+
+loginBtn.addEventListener("click", async () => {
+
+    const email = document.getElementById("email").value.trim();
+
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+
+        messageEl.innerText = "Enter email and password.";
+
+        return;
+
+    }
+
+    loginBtn.disabled = true;
+
+    messageEl.innerText = "Logging in...";
+
+    try {
+
+        await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+    }
+
+    catch (error) {
+
+        messageEl.innerText = error.message;
+
+    }
+
+    finally {
+
+        loginBtn.disabled = false;
+
+    }
+
+});
+
+
+// ====================================
+// LOGOUT FUNCTION
+// ====================================
+
+logoutBtn.addEventListener("click", async () => {
+
+    try {
+
+        await signOut(auth);
+
+    }
+
+    catch (error) {
+
+        messageEl.innerText = error.message;
+
+    }
+
+});
+
+
+// ====================================
+// AUTHENTICATION CHECK
+// ====================================
+
+onAuthStateChanged(auth, (user) => {
+
+    // Remove old database listeners
+    unsubscribe.forEach(fn => fn());
+
+    unsubscribe = [];
+
+    if (user) {
+
+        messageEl.innerText = "Successfully connected to Firebase.";
+
+        loginBtn.hidden = true;
+
+        logoutBtn.hidden = false;
+
+        connectionEl.innerText = "Firebase: Connected";
+
+        startMonitoring();
+
+    }
+
+    else {
+
+        messageEl.innerText = "Please login to view live data.";
+
+        loginBtn.hidden = false;
+
+        logoutBtn.hidden = true;
+
+        voltageEl.innerText = "--";
+
+        counterEl.innerText = "--";
+
+        statusEl.innerText = "UNKNOWN";
+
+        statusEl.className = "status unknown";
+
+        lastUpdateEl.innerText = "Last Update: --";
+
+        connectionEl.innerText = "Firebase: Disconnected";
+
+    }
+
+});
+
+
+// ====================================
+// REALTIME DATABASE MONITORING
+// ====================================
+
+function startMonitoring() {
+
+    // Counter
+    const counterRef = ref(database, "ESP32/Counter");
+
+    unsubscribe.push(
+
+        onValue(counterRef, (snapshot) => {
+
+            counterEl.innerText = snapshot.exists()
+                ? snapshot.val()
+                : "--";
+
+            updateTime();
+
+        }, databaseError)
+
+    );
+
+
+    // Voltage
+    const voltageRef = ref(database, "ESP32/Voltage");
+
+    unsubscribe.push(
+
+        onValue(voltageRef, (snapshot) => {
+
+            voltageEl.innerText = snapshot.exists()
+                ? Number(snapshot.val()).toFixed(2)
+                : "--";
+
+            updateTime();
+
+        }, databaseError)
+
+    );
+
+
+    // Device Status
+    const statusRef = ref(database, "ESP32/Status");
+
+    unsubscribe.push(
+
+        onValue(statusRef, (snapshot) => {
+
+            const value = snapshot.val();
+
+            statusEl.innerText = value || "UNKNOWN";
+
+            if (value === "ONLINE") {
+
+                statusEl.className = "status online";
+
+            }
+
+            else if (value === "OFFLINE") {
+
+                statusEl.className = "status offline";
+
+            }
+
+            else {
+
+                statusEl.className = "status unknown";
+
+            }
+
+            updateTime();
+
+        }, databaseError)
+
+    );
+
+}
+
+
+// ====================================
+// UPDATE TIME
+// ====================================
+
+function updateTime() {
+
+    lastUpdateEl.innerText =
+        "Last Database Update: " +
+        new Date().toLocaleString();
+
+}
+
+
+// ====================================
+// DATABASE ERROR
+// ====================================
+
+function databaseError(error) {
+
+    messageEl.innerText =
+        "Database Error: " + error.message;
+
+}
+
+</script>
+
+</body>
+</html>
