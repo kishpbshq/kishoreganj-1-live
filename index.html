@@ -1,159 +1,358 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kishoreganj-1 Substation Monitoring</title>
 
-<title>Kishoreganj-1 Live Monitoring</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<!-- Firebase Styling -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-* {
-    box-sizing: border-box;
+:root {
+  --bg: #f3f6fb;
+  --card: #ffffff;
+  --ink: #18243a;
+  --muted: #68758a;
+  --line: #e4eaf2;
+  --green: #16a34a;
+  --red: #dc2626;
+  --blue: #1d4ed8;
+  --amber: #d97706;
 }
 
+* { box-sizing: border-box; }
+
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #eef2f7;
-    color: #1e293b;
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, "Hind Siliguri", sans-serif;
 }
 
 header {
-    background: #123c69;
-    color: white;
-    padding: 22px 15px;
-    text-align: center;
+  background: #102747;
+  color: white;
+  padding: 22px 18px;
+  text-align: center;
+  border-bottom: 4px solid #20a45a;
+}
+
+header h1 {
+  margin: 0;
+  font-size: clamp(21px, 3vw, 30px);
+  font-weight: 800;
 }
 
 header h2 {
-    margin: 0;
-    font-size: 25px;
+  margin: 7px 0 0;
+  font-size: clamp(15px, 2vw, 20px);
+  font-weight: 500;
+  color: #dce8f7;
 }
 
-header p {
-    margin-bottom: 0;
-    color: #dbeafe;
+.header-info {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #e7eef8;
 }
 
-.container {
-    max-width: 1000px;
-    margin: 25px auto;
-    padding: 15px;
-}
-
-.login-box {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 22px;
-    box-shadow: 0 3px 12px #0001;
-}
-
-input {
-    width: 100%;
-    padding: 12px;
-    margin: 7px 0;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 15px;
-}
-
-button {
-    background: #123c69;
-    color: white;
-    border: none;
-    padding: 12px 22px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 8px;
-}
-
-button:hover {
-    background: #1e5a91;
-}
-
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.cards {
-    display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(220px, 1fr)
-    );
-    gap: 18px;
-}
-
-.card {
-    background: white;
-    padding: 28px 15px;
-    text-align: center;
-    border-radius: 12px;
-    box-shadow: 0 3px 12px #0001;
-    border-top: 4px solid #123c69;
-}
-
-.card h3 {
-    color: #64748b;
-    font-size: 16px;
-}
-
-.value {
-    font-size: 38px;
-    font-weight: bold;
-    color: #123c69;
-    margin-top: 15px;
-}
-
-.unit {
-    font-size: 18px;
-}
-
-.status {
-    font-size: 23px;
-    font-weight: bold;
-    margin-top: 20px;
-}
-
-.online {
-    color: #16a34a;
-}
-
-.offline {
-    color: #dc2626;
-}
-
-.unknown {
-    color: #64748b;
-}
-
-.info {
-    background: white;
-    margin-top: 22px;
-    padding: 18px;
-    border-radius: 10px;
-    box-shadow: 0 3px 12px #0001;
-}
-
-#message {
-    font-size: 14px;
-    color: #dc2626;
+#clock {
+  font-weight: 700;
+  color: #8df0b0;
 }
 
 #lastUpdate {
-    color: #64748b;
-    font-size: 13px;
+  font-weight: 600;
+}
+
+main {
+  width: min(1500px, 96%);
+  margin: 22px auto;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 18px rgba(25, 45, 75, .045);
+}
+
+.panel h3 {
+  margin: 0 0 16px;
+  font-size: 19px;
+}
+
+.section-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: -10px;
+  margin-bottom: 15px;
+}
+
+#loginBox {
+  max-width: 420px;
+  margin: 35px auto;
+}
+
+input, button {
+  font: inherit;
+  padding: 11px 12px;
+  border-radius: 8px;
+  border: 1px solid #d5deea;
+}
+
+input {
+  width: 100%;
+  background: white;
+  margin: 5px 0 12px;
+}
+
+button {
+  cursor: pointer;
+  background: var(--blue);
+  color: white;
+  border: 0;
+  font-weight: 700;
+}
+
+button:hover { opacity: .9; }
+
+#loginMessage {
+  color: var(--red);
+  font-size: 13px;
+}
+
+#dashboard { display: none; }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.connection {
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 30px;
+  padding: 8px 13px;
+  background: #e7f8ed;
+  color: #087b36;
+}
+
+.connection.offline {
+  background: #fff0f0;
+  color: #bd1f1f;
+}
+
+.connection.stale {
+  background: #fff6df;
+  color: #9a5a00;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.summary-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.summary-card small {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.summary-card strong {
+  display: block;
+  font-size: 27px;
+  margin-top: 8px;
+}
+
+.feeder-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.feeder-card {
+  border-radius: 12px;
+  padding: 15px;
+  color: white;
+  min-height: 170px;
+  transition: background .2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+}
+
+.feeder-card.on { background: #168746; }
+.feeder-card.off { background: #c62828; }
+.feeder-card.unknown { background: #68758a; }
+
+.feeder-card h4 {
+  margin: 0 0 9px;
+  font-size: 17px;
+}
+
+.feeder-card .state {
+  display: inline-block;
+  background: rgba(255,255,255,.2);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.feeder-card .areas {
+  font-family: "Hind Siliguri", sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.sld-wrap {
+  overflow-x: auto;
+  background: #fbfcfe;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+#sld {
+  width: 100%;
+  min-width: 650px;
+  height: auto;
+  display: block;
+}
+
+.sld-line {
+  stroke: #c62828;
+  stroke-width: 7;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke .2s;
+}
+
+.sld-line.on { stroke: #16a34a; }
+
+.sld-bus {
+  stroke: #c62828;
+  stroke-width: 10;
+  transition: stroke .2s;
+}
+
+.sld-bus.on { stroke: #16a34a; }
+
+.sld-text {
+  fill: #26354b;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: Inter, sans-serif;
+}
+
+.sld-status {
+  fill: #64748b;
+  font-size: 12px;
+  font-family: Inter, sans-serif;
+}
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 650px;
+  font-size: 13px;
+}
+
+th, td {
+  border-bottom: 1px solid var(--line);
+  padding: 11px 10px;
+  text-align: left;
+}
+
+th {
+  background: #f2f6fb;
+  color: #34445d;
+}
+
+.badge {
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 11px;
+}
+
+.badge.ON { background: #dcfce7; color: #087b36; }
+.badge.OFF { background: #fee2e2; color: #b91c1c; }
+
+.filter-row {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.filter-row label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  min-width: 150px;
+}
+
+.filter-row input {
+  display: block;
+  margin-top: 6px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.chart-box {
+  min-width: 0;
+  height: 330px;
+}
+
+.chart-box h4 {
+  margin: 0 0 12px;
 }
 
 footer {
-    text-align: center;
-    padding: 25px;
-    color: #64748b;
-    font-size: 13px;
+  text-align: center;
+  padding: 25px 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media(max-width: 950px) {
+  .feeder-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media(max-width: 650px) {
+  .summary-grid { grid-template-columns: 1fr; }
+  .feeder-grid { grid-template-columns: 1fr; }
+  .chart-grid { grid-template-columns: 1fr; }
+  .chart-box { height: 280px; }
+  .panel { padding: 13px; }
 }
 </style>
 </head>
@@ -161,418 +360,748 @@ footer {
 <body>
 
 <header>
-    <h2>KISHOREGANJ-1</h2>
-    <p>ESP32 LIVE VOLTAGE MONITORING SYSTEM</p>
+  <h1>Kishoreganj PBS</h1>
+  <h2>Kishoreganj-1 (HQ) 20 MVA Substation</h2>
+
+  <div class="header-info">
+    <div>Live Clock: <span id="clock">--</span></div>
+    <div>Last Update: <span id="lastUpdate">Waiting for ESP32...</span></div>
+  </div>
 </header>
 
-<div class="container">
+<main>
 
-    <!-- Firebase Login -->
-    <div class="login-box">
+  <!-- LOGIN -->
+  <section id="loginBox" class="panel">
+    <h3>Substation Dashboard Login</h3>
 
-        <h3>Firebase Authentication</h3>
+    <label>Email Address</label>
+    <input id="email" type="email" placeholder="Firebase login email">
 
-        <input
-            type="email"
-            id="email"
-            placeholder="Enter Firebase Email"
-        >
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Password">
 
-        <input
-            type="password"
-            id="password"
-            placeholder="Enter Firebase Password"
-        >
+    <button id="loginButton" style="width:100%">Login</button>
+    <p id="loginMessage"></p>
+  </section>
 
-        <button id="loginBtn">LOGIN</button>
+  <!-- DASHBOARD -->
+  <div id="dashboard">
 
-        <button id="logoutBtn" hidden>LOGOUT</button>
-
-        <p id="message">Please login to view live data.</p>
-
+    <div class="topbar">
+      <strong>Kishoreganj-1 Substation — Live Monitoring</strong>
+      <div>
+        <span id="connection" class="connection offline">WAITING FOR ESP32</span>
+        <button id="logoutButton" style="margin-left:8px">Logout</button>
+      </div>
     </div>
 
-
-    <!-- Monitoring Cards -->
-    <div class="cards">
-
-        <!-- Voltage -->
-        <div class="card">
-
-            <h3>VOLTAGE</h3>
-
-            <div class="value">
-                <span id="voltage">--</span>
-                <span class="unit">V</span>
-            </div>
-
-        </div>
-
-
-        <!-- Counter -->
-        <div class="card">
-
-            <h3>COUNTER</h3>
-
-            <div class="value" id="counter">
-                --
-            </div>
-
-        </div>
-
-
-        <!-- Device Status -->
-        <div class="card">
-
-            <h3>ESP32 STATUS</h3>
-
-            <div class="status unknown" id="status">
-                UNKNOWN
-            </div>
-
-        </div>
-
+    <div class="summary-grid">
+      <div class="summary-card">
+        <small>Feeders ON</small>
+        <strong id="onCount">0 / 8</strong>
+      </div>
+      <div class="summary-card">
+        <small>Feeders OFF</small>
+        <strong id="offCount">0 / 8</strong>
+      </div>
+      <div class="summary-card">
+        <small>33 kV Incoming</small>
+        <strong id="incomingStatus">UNKNOWN</strong>
+      </div>
     </div>
 
+    <!-- FEEDER AREA PANELS -->
+    <section class="panel">
+      <h3>1. Feeder-wise Area Status</h3>
+      <p class="section-subtitle">
+        Green = Feeder ON | Red = Feeder OFF | Grey = No confirmed data
+      </p>
+      <div id="feederGrid" class="feeder-grid"></div>
+    </section>
 
-    <!-- Information -->
-    <div class="info">
+    <!-- SINGLE LINE DIAGRAM -->
+    <section class="panel">
+      <h3>2. 33 kV Single Line Diagram</h3>
+      <p class="section-subtitle">
+        Incoming bus becomes green when at least one feeder is ON.
+      </p>
 
-        <h3>Monitoring Information</h3>
+      <div class="sld-wrap">
+        <svg id="sld" viewBox="0 0 900 430"
+             xmlns="http://www.w3.org/2000/svg">
 
-        <p>
-            Device: <b>ESP32 DevKit V1</b>
-        </p>
+          <text x="450" y="28" text-anchor="middle" class="sld-text">
+            33 kV INCOMING
+          </text>
 
-        <p>
-            Database: <b>Kishoreganj-1 Live</b>
-        </p>
+          <line id="incomingLine" class="sld-line"
+                x1="450" y1="40" x2="450" y2="95"/>
 
-        <p id="lastUpdate">
-            Last Update: --
-        </p>
+          <line id="mainBus" class="sld-bus"
+                x1="75" y1="95" x2="825" y2="95"/>
 
-        <p id="connection">
-            Firebase: Disconnected
-        </p>
+          <text x="450" y="120" text-anchor="middle" class="sld-status">
+            33 kV BUS
+          </text>
 
-    </div>
+          <g id="sldBranches"></g>
+        </svg>
+      </div>
+    </section>
 
-</div>
+    <!-- EVENT TABLE -->
+    <section class="panel">
+      <h3>3. Feeder ON/OFF Event History</h3>
+      <p class="section-subtitle">
+        Each row represents a feeder state change received from the ESP32.
+      </p>
 
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SL</th>
+              <th>Date & Time</th>
+              <th>Feeder</th>
+              <th>Event</th>
+              <th>Interruption Duration</th>
+            </tr>
+          </thead>
+          <tbody id="eventTable">
+            <tr><td colspan="5">Waiting for events...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FILTER + CHARTS -->
+    <section class="panel">
+      <h3>4. Feeder Interruption Analysis</h3>
+      <p class="section-subtitle">
+        Select a date range to calculate interruptions and interruption duration.
+      </p>
+
+      <div class="filter-row">
+        <label>
+          From Date
+          <input type="date" id="fromDate">
+        </label>
+
+        <label>
+          To Date
+          <input type="date" id="toDate">
+        </label>
+
+        <button id="filterButton">Apply Filter</button>
+      </div>
+
+      <div class="chart-grid">
+        <div class="chart-box">
+          <h4>Number of Interruptions</h4>
+          <canvas id="countChart"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <h4>Interruption Duration (Hours)</h4>
+          <canvas id="durationChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
 
 <footer>
-    Kishoreganj-1 Live Monitoring System
-    <br><br>
-    Powered by ESP32 & Firebase Realtime Database
+  Kishoreganj Palli Bidyut Samity | Kishoreganj-1 (HQ) Substation Monitoring
 </footer>
 
-
-<!-- Firebase JavaScript -->
 <script type="module">
 
-// Import Firebase
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-    getAuth,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
-    getDatabase,
-    ref,
-    onValue
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  getDatabase,
+  ref,
+  onValue
+} from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-
-// ====================================
+// --------------------------------------------------
 // FIREBASE CONFIGURATION
-// ====================================
+// --------------------------------------------------
 
 const firebaseConfig = {
-
-    apiKey: "AIzaSyCHUJB83o2CzwGHEN-JnPXJW5RZRRfh-DA",
-
-    authDomain: "kishoreganj-1-live.firebaseapp.com",
-
-    databaseURL: "https://kishoreganj-1-live-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-    projectId: "kishoreganj-1-live",
-
-    storageBucket: "kishoreganj-1-live.firebasestorage.app",
-
-    messagingSenderId: "362129007391",
-
-    appId: "1:362129007391:web:f241f32c96aedf699a462a",
-
-    measurementId: "G-B4MGXFNQ8B"
-
+  apiKey: "AIzaSyCHUJB83o2CzwGHEN-JnPXJW5RZRRfh-DA",
+  authDomain: "kishoreganj-1-live.firebaseapp.com",
+  databaseURL: "https://kishoreganj-1-live-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kishoreganj-1-live",
+  storageBucket: "kishoreganj-1-live.firebasestorage.app",
+  messagingSenderId: "362129007391",
+  appId: "1:362129007391:web:f241f32c96aedf699a462a",
+  measurementId: "G-B4MGXFNQ8B"
 };
 
-
-// ====================================
-// INITIALIZE FIREBASE
-// ====================================
-
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
-const database = getDatabase(app);
-
-
-// ====================================
-// HTML ELEMENTS
-// ====================================
-
-const voltageEl = document.getElementById("voltage");
-
-const counterEl = document.getElementById("counter");
-
-const statusEl = document.getElementById("status");
-
-const messageEl = document.getElementById("message");
-
-const lastUpdateEl = document.getElementById("lastUpdate");
-
-const connectionEl = document.getElementById("connection");
-
-const loginBtn = document.getElementById("loginBtn");
-
-const logoutBtn = document.getElementById("logoutBtn");
-
-let unsubscribe = [];
-
-
-// ====================================
-// LOGIN FUNCTION
-// ====================================
-
-loginBtn.addEventListener("click", async () => {
-
-    const email = document.getElementById("email").value.trim();
-
-    const password = document.getElementById("password").value;
-
-    if (!email || !password) {
-
-        messageEl.innerText = "Enter email and password.";
-
-        return;
-
-    }
-
-    loginBtn.disabled = true;
-
-    messageEl.innerText = "Logging in...";
-
-    try {
-
-        await signInWithEmailAndPassword(
-            auth,
-            email,
-            password
-        );
-
-    }
-
-    catch (error) {
-
-        messageEl.innerText = error.message;
-
-    }
-
-    finally {
-
-        loginBtn.disabled = false;
-
-    }
-
-});
-
-
-// ====================================
-// LOGOUT FUNCTION
-// ====================================
-
-logoutBtn.addEventListener("click", async () => {
-
-    try {
-
-        await signOut(auth);
-
-    }
-
-    catch (error) {
-
-        messageEl.innerText = error.message;
-
-    }
-
-});
-
-
-// ====================================
-// AUTHENTICATION CHECK
-// ====================================
-
-onAuthStateChanged(auth, (user) => {
-
-    // Remove old database listeners
-    unsubscribe.forEach(fn => fn());
-
-    unsubscribe = [];
-
-    if (user) {
-
-        messageEl.innerText = "Successfully connected to Firebase.";
-
-        loginBtn.hidden = true;
-
-        logoutBtn.hidden = false;
-
-        connectionEl.innerText = "Firebase: Connected";
-
-        startMonitoring();
-
-    }
-
-    else {
-
-        messageEl.innerText = "Please login to view live data.";
-
-        loginBtn.hidden = false;
-
-        logoutBtn.hidden = true;
-
-        voltageEl.innerText = "--";
-
-        counterEl.innerText = "--";
-
-        statusEl.innerText = "UNKNOWN";
-
-        statusEl.className = "status unknown";
-
-        lastUpdateEl.innerText = "Last Update: --";
-
-        connectionEl.innerText = "Firebase: Disconnected";
-
-    }
-
-});
-
-
-// ====================================
-// REALTIME DATABASE MONITORING
-// ====================================
-
-function startMonitoring() {
-
-    // Counter
-    const counterRef = ref(database, "ESP32/Counter");
-
-    unsubscribe.push(
-
-        onValue(counterRef, (snapshot) => {
-
-            counterEl.innerText = snapshot.exists()
-                ? snapshot.val()
-                : "--";
-
-            updateTime();
-
-        }, databaseError)
-
-    );
-
-
-    // Voltage
-    const voltageRef = ref(database, "ESP32/Voltage");
-
-    unsubscribe.push(
-
-        onValue(voltageRef, (snapshot) => {
-
-            voltageEl.innerText = snapshot.exists()
-                ? Number(snapshot.val()).toFixed(2)
-                : "--";
-
-            updateTime();
-
-        }, databaseError)
-
-    );
-
-
-    // Device Status
-    const statusRef = ref(database, "ESP32/Status");
-
-    unsubscribe.push(
-
-        onValue(statusRef, (snapshot) => {
-
-            const value = snapshot.val();
-
-            statusEl.innerText = value || "UNKNOWN";
-
-            if (value === "ONLINE") {
-
-                statusEl.className = "status online";
-
-            }
-
-            else if (value === "OFFLINE") {
-
-                statusEl.className = "status offline";
-
-            }
-
-            else {
-
-                statusEl.className = "status unknown";
-
-            }
-
-            updateTime();
-
-        }, databaseError)
-
-    );
-
+const db = getDatabase(app);
+
+// --------------------------------------------------
+// FEEDER AREAS
+// --------------------------------------------------
+
+const feeders = [
+  {
+    name: "Feeder-1",
+    areas: `মুকসেদপুর, নতুন পল্লী`
+  },
+  {
+    name: "Feeder-2",
+    areas: `তেরহাসিয়া, পুটিপাড়া, বৌলাইবাজার, দক্ষিণ রাজকুন্তি, উত্তর রাজকুন্তি, পাঠানপাড়া, নাকভাঙ্গা, জাল্লাবাদ, রঘুনন্দনপুর, ভরাটি, ভরাটি চর পাড়া, পূর্ব ভরাটি, চেয়ারম্যান বাজার, রাজকুন্তি, আজিম বাজার, রাশি হাট, মৈশাখালি, পাতালজান, পাটধা, নয়াপাড়া, গাবতলি, সালজান, গড়ানিয়ারপাড়, ডিগ্রিকান্দা`
+  },
+  {
+    name: "Feeder-3",
+    areas: `মুকসেদপুর, কাশুয়ারচর, মহিনন্দ আগপাড়া, নয়াপাড়া, বাটুয়ারপাড়, নীলগঞ্জ বাজার, কাচারীপাড়া, বাজারীপাড়া, মৈশাকান্দি আওয়ালিয়া বাড়ি, বান্দলদিয়া, মহিনন্দ নদীরপার, বেলতলি, মজুমদার পাড়া, ইসলামপুর, গালিমগাজী, মহিনন্দ চরপাড়া, মৈশাকান্দি, বেত্রাটি, লালস্কুল, বেপারী পাড়া, তালজাঙ্গা, বেত্রাটি মীরপাড়া, চৌধুরীহাটি, চেয়ারম্যান বাজার, হাজিরগল, বরখাপন, জালালপুর, মহিনন্দ উত্তর পাড়া, বাস্করখিলা, মজুমদার পাড়া, চন্দ্রাবতী, ষ্টেশনঘাট, বাজারি পাড়া নদীরপাড়, ভাসানিপাড়া, মিলনগঞ্জবাজার`
+  },
+  {
+    name: "Feeder-4",
+    areas: `কাটাবাড়িয়া, বড়ভাগ, ভাটগাও, আলমপুর, সাদুল্লাহ, ব্রাহ্মনকচুরী`
+  },
+  {
+    name: "Feeder-5",
+    areas: `সগড়া, রশিদাবাদ, লতিবপুর, শ্রীমন্তপুর, বারতোপা, শিমুলিয়া, কাকতৈল, ছফিলা, রামদিয়া`
+  },
+  {
+    name: "Feeder-6",
+    areas: `মুকসেদপুর, লতিবাবাদ, পাবইকান্দি, লক্ষীগঞ্জ, বেরুয়াইল, সগড়া, রশিদাবাদ, কাকতৈল, ভূইয়াবাড়ি, ঝাটাসিড়া, খিলপাড়া, পাঠানকান্দি, কাতিয়ারচর, প্যারাভাঙ্গা, কুট্রাগড়, দনাইল`
+  },
+  {
+    name: "Feeder-7",
+    areas: `মুকসেদপুর, পাসপোর্ট অফিস`
+  },
+  {
+    name: "Feeder-8",
+    areas: `মুকসেদপুর, খিরদাবাজার, ভদ্রপাড়া, কলাপাড়া, বাদেশোলাকিয়া, হাজরাদী, রগুখালী, বৌলাই, চং শোলাকিয়া, গাংগাইল`
+  }
+];
+
+// --------------------------------------------------
+// STATE
+// --------------------------------------------------
+
+let liveData = {};
+let allEvents = {};
+let lastSeen = 0;
+
+let liveUnsubscribe = null;
+let eventUnsubscribe = null;
+let heartbeatUnsubscribe = null;
+
+let countChart = null;
+let durationChart = null;
+
+const $ = id => document.getElementById(id);
+
+const feederKeys = feeders.map((_, i) => `Feeder${i + 1}`);
+
+// --------------------------------------------------
+// CLOCK
+// --------------------------------------------------
+
+function updateClock() {
+  $("clock").textContent =
+    new Date().toLocaleString("en-GB", {
+      timeZone: "Asia/Dhaka",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
+    });
 }
 
+setInterval(updateClock, 1000);
+updateClock();
 
-// ====================================
-// UPDATE TIME
-// ====================================
+// --------------------------------------------------
+// LOGIN
+// --------------------------------------------------
 
-function updateTime() {
+$("loginButton").addEventListener("click", async () => {
+  $("loginMessage").textContent = "";
 
-    lastUpdateEl.innerText =
-        "Last Database Update: " +
-        new Date().toLocaleString();
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      $("email").value.trim(),
+      $("password").value
+    );
+  } catch (error) {
+    $("loginMessage").textContent = error.message;
+  }
+});
 
+$("logoutButton").addEventListener("click", () => signOut(auth));
+
+// --------------------------------------------------
+// AUTH STATE
+// --------------------------------------------------
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    $("loginBox").style.display = "none";
+    $("dashboard").style.display = "block";
+    startDashboard();
+  } else {
+    stopDashboard();
+    $("loginBox").style.display = "block";
+    $("dashboard").style.display = "none";
+  }
+});
+
+// --------------------------------------------------
+// FEEDER PANEL CREATION
+// --------------------------------------------------
+
+function createFeederPanels() {
+  $("feederGrid").innerHTML = "";
+
+  feeders.forEach((feeder, index) => {
+    const card = document.createElement("div");
+    card.className = "feeder-card unknown";
+    card.id = `card${index + 1}`;
+
+    const title = document.createElement("h4");
+    title.textContent = feeder.name;
+
+    const state = document.createElement("div");
+    state.className = "state";
+    state.id = `state${index + 1}`;
+    state.textContent = "WAITING";
+
+    const areas = document.createElement("div");
+    areas.className = "areas";
+    areas.textContent = feeder.areas;
+
+    card.append(title, state, areas);
+    $("feederGrid").appendChild(card);
+  });
 }
 
+// --------------------------------------------------
+// SINGLE LINE DIAGRAM
+// --------------------------------------------------
 
-// ====================================
-// DATABASE ERROR
-// ====================================
+function createSLD() {
+  const group = $("sldBranches");
+  group.innerHTML = "";
 
-function databaseError(error) {
+  for (let i = 0; i < 8; i++) {
+    const x = 75 + i * 107;
+    const lineId = `sldLine${i + 1}`;
 
-    messageEl.innerText =
-        "Database Error: " + error.message;
+    const branch = document.createElementNS(
+      "http://www.w3.org/2000/svg", "g"
+    );
 
+    branch.innerHTML = `
+      <line id="${lineId}" class="sld-line"
+        x1="${x}" y1="95" x2="${x}" y2="250"/>
+      <rect x="${x - 8}" y="160" width="16" height="22"
+        rx="2" fill="#ffffff" stroke="#526176" stroke-width="2"/>
+      <text x="${x}" y="275" text-anchor="middle"
+        class="sld-text">F${i + 1}</text>
+      <text id="sldState${i + 1}" x="${x}" y="296"
+        text-anchor="middle" class="sld-status">UNKNOWN</text>
+    `;
+
+    group.appendChild(branch);
+  }
 }
+
+// --------------------------------------------------
+// LIVE STATUS DISPLAY
+// --------------------------------------------------
+
+function updateLiveDashboard() {
+  let on = 0;
+  let off = 0;
+  let known = 0;
+
+  feeders.forEach((feeder, index) => {
+    const key = feederKeys[index];
+    const value = liveData[key]?.on;
+
+    const card = $(`card${index + 1}`);
+    const state = $(`state${index + 1}`);
+
+    card.className = "feeder-card";
+
+    if (typeof value !== "boolean") {
+      card.classList.add("unknown");
+      state.textContent = "UNKNOWN";
+      return;
+    }
+
+    known++;
+
+    if (value) {
+      on++;
+      card.classList.add("on");
+      state.textContent = "FEEDER ON";
+    } else {
+      off++;
+      card.classList.add("off");
+      state.textContent = "FEEDER OFF";
+    }
+
+    const line = $(`sldLine${index + 1}`);
+    const sldState = $(`sldState${index + 1}`);
+
+    line.classList.toggle("on", value);
+    sldState.textContent = value ? "ON" : "OFF";
+  });
+
+  $("onCount").textContent = `${on} / 8`;
+  $("offCount").textContent = `${off} / 8`;
+
+  const incoming = on > 0;
+  $("incomingStatus").textContent =
+    known === 0 ? "UNKNOWN" : incoming ? "ON" : "OFF";
+
+  $("incomingLine").classList.toggle("on", incoming);
+  $("mainBus").classList.toggle("on", incoming);
+}
+
+// --------------------------------------------------
+// CONNECTION / LAST UPDATE
+// --------------------------------------------------
+
+function updateConnection() {
+  const connection = $("connection");
+  const age = Date.now() - lastSeen;
+
+  if (!lastSeen) {
+    connection.textContent = "WAITING FOR ESP32";
+    connection.className = "connection offline";
+    $("lastUpdate").textContent = "No update received";
+    return;
+  }
+
+  $("lastUpdate").textContent =
+    new Date(lastSeen).toLocaleString("en-US", {
+      timeZone: "Asia/Dhaka"
+    });
+
+  if (age > 45000) {
+    connection.textContent = "ESP32 DATA STALE";
+    connection.className = "connection stale";
+  } else {
+    connection.textContent = "ESP32 ONLINE";
+    connection.className = "connection";
+  }
+}
+
+// --------------------------------------------------
+// EVENT PROCESSING
+// --------------------------------------------------
+
+function getSortedEvents() {
+  return Object.entries(allEvents || {})
+    .map(([id, event]) => ({ id, ...event }))
+    .filter(event =>
+      event &&
+      typeof event.timestamp === "number" &&
+      (event.state === "ON" || event.state === "OFF")
+    )
+    .sort((a, b) => a.timestamp - b.timestamp);
+}
+
+function formatDate(timestamp) {
+  return new Date(timestamp).toLocaleString("en-GB", {
+    timeZone: "Asia/Dhaka",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+}
+
+// Pair each OFF with the next ON for that feeder.
+// An ongoing outage is measured up to the current time.
+function calculateDurations(events) {
+  const openOutages = {};
+  const durations = {};
+
+  feederKeys.forEach(key => {
+    durations[key] = {};
+  });
+
+  events.forEach(event => {
+    const key = event.feeder;
+
+    if (!durations[key]) return;
+
+    if (event.state === "OFF") {
+      openOutages[key] = event.timestamp;
+    }
+
+    if (event.state === "ON" && openOutages[key]) {
+      const start = openOutages[key];
+      const end = event.timestamp;
+
+      durations[key][start] = Math.max(0, end - start);
+      delete openOutages[key];
+    }
+  });
+
+  Object.entries(openOutages).forEach(([key, start]) => {
+    const currentState = liveData[key]?.on;
+
+    if (currentState === false) {
+      durations[key][start] = Math.max(0, Date.now() - start);
+    }
+  });
+
+  return durations;
+}
+
+// --------------------------------------------------
+// EVENT TABLE
+// --------------------------------------------------
+
+function renderEventTable() {
+  const events = getSortedEvents().reverse();
+  const durations = calculateDurations(events.slice().reverse());
+
+  const rows = events.slice(0, 150);
+
+  if (!rows.length) {
+    $("eventTable").innerHTML =
+      '<tr><td colspan="5">No event history available.</td></tr>';
+    return;
+  }
+
+  $("eventTable").innerHTML = rows.map((event, index) => {
+    const durationMs = durations[event.feeder]?.[event.timestamp] || 0;
+    const durationText = event.state === "OFF"
+      ? (durationMs ? formatDuration(durationMs) : "Ongoing / not yet restored")
+      : "—";
+
+    return `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${formatDate(event.timestamp)}</td>
+        <td>${event.feeder || ""}</td>
+        <td><span class="badge ${event.state}">${event.state}</span></td>
+        <td>${durationText}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function formatDuration(milliseconds) {
+  const totalMinutes = Math.floor(milliseconds / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  return `${hours} hr ${minutes} min`;
+}
+
+// --------------------------------------------------
+// DATE FILTER AND CHARTS
+// --------------------------------------------------
+
+function localDateString(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function setDefaultDates() {
+  const today = localDateString(new Date());
+  $("fromDate").value = today;
+  $("toDate").value = today;
+}
+
+function selectedRange() {
+  const from = $("fromDate").value;
+  const to = $("toDate").value;
+
+  if (!from || !to || from > to) {
+    alert("Please select a valid date range.");
+    return null;
+  }
+
+  // Convert local date boundaries to timestamps.
+  const start = new Date(`${from}T00:00:00+06:00`).getTime();
+  const end = new Date(`${to}T23:59:59.999+06:00`).getTime();
+
+  return { start, end };
+}
+
+function updateCharts() {
+  const range = selectedRange();
+  if (!range) return;
+
+  const events = getSortedEvents();
+  const durations = calculateDurations(events);
+
+  const countValues = [];
+  const durationValues = [];
+
+  feederKeys.forEach(key => {
+    const outages = events.filter(event =>
+      event.feeder === key &&
+      event.state === "OFF" &&
+      event.timestamp >= range.start &&
+      event.timestamp <= range.end
+    );
+
+    countValues.push(outages.length);
+
+    let totalMs = 0;
+
+    outages.forEach(event => {
+      totalMs += durations[key]?.[event.timestamp] || 0;
+    });
+
+    durationValues.push(
+      Number((totalMs / 3600000).toFixed(2))
+    );
+  });
+
+  if (countChart) countChart.destroy();
+  if (durationChart) durationChart.destroy();
+
+  countChart = new Chart($("countChart"), {
+    type: "bar",
+    data: {
+      labels: feederKeys,
+      datasets: [{
+        label: "Number of interruptions",
+        data: countValues,
+        backgroundColor: "#2563eb",
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { precision: 0 }
+        }
+      }
+    }
+  });
+
+  durationChart = new Chart($("durationChart"), {
+    type: "bar",
+    data: {
+      labels: feederKeys,
+      datasets: [{
+        label: "Duration (hours)",
+        data: durationValues,
+        backgroundColor: "#16a34a",
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+// --------------------------------------------------
+// FIREBASE LISTENERS
+// --------------------------------------------------
+
+function startDashboard() {
+  createFeederPanels();
+  createSLD();
+  setDefaultDates();
+
+  if (liveUnsubscribe) liveUnsubscribe();
+  if (eventUnsubscribe) eventUnsubscribe();
+  if (heartbeatUnsubscribe) heartbeatUnsubscribe();
+
+  liveUnsubscribe = onValue(
+    ref(db, "Substation/Live"),
+    snapshot => {
+      liveData = snapshot.val() || {};
+      updateLiveDashboard();
+      renderEventTable();
+      updateCharts();
+    }
+  );
+
+  eventUnsubscribe = onValue(
+    ref(db, "Substation/Events"),
+    snapshot => {
+      allEvents = snapshot.val() || {};
+      renderEventTable();
+      updateCharts();
+    }
+  );
+
+  heartbeatUnsubscribe = onValue(
+    ref(db, "Substation/Meta/lastSeen"),
+    snapshot => {
+      lastSeen = Number(snapshot.val()) || 0;
+      updateConnection();
+    }
+  );
+
+  updateConnection();
+}
+
+function stopDashboard() {
+  if (liveUnsubscribe) liveUnsubscribe();
+  if (eventUnsubscribe) eventUnsubscribe();
+  if (heartbeatUnsubscribe) heartbeatUnsubscribe();
+
+  liveUnsubscribe = null;
+  eventUnsubscribe = null;
+  heartbeatUnsubscribe = null;
+}
+
+// --------------------------------------------------
+// BUTTONS / PERIODIC DISPLAY
+// --------------------------------------------------
+
+$("filterButton").addEventListener("click", updateCharts);
+
+setInterval(updateConnection, 5000);
 
 </script>
-
 </body>
 </html>
