@@ -1,1 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kishoreganj-1 Substation Monitoring</title>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,"Noto Sans Bengali",sans-serif;
+  background:#f1f5f9;
+  color:#1e293b
+}
+header{
+  background:linear-gradient(135deg,#0f172a,#164e63);
+  color:white;
+  padding:20px 24px;
+  box-shadow:0 3px 12px #0002
+}
+.header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px
+}
+.header-title h1{margin:0;font-size:25px}
+.header-title p{margin:7px 0 0;color:#cbd5e1;font-size:14px}
+.header-info{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:18px
+}
+.info-card{
+  background:#ffffff14;
+  border:1px solid #ffffff25;
+  padding:10px 14px;
+  border-radius:9px;
+  min-width:145px
+}
+.info-label{
+  font-size:11px;
+  color:#cbd5e1;
+  display:block;
+  margin-bottom:6px
+}
+.info-value{font-size:13px;font-weight:bold}
+.substation-connected{color:#4ade80}
+.substation-disconnected{color:#f87171}
+.firebase-online{color:#4ade80}
+.firebase-offline{color:#f87171}
+
+nav{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:15px;
+  background:white;
+  box-shadow:0 2px 6px #0000000d
+}
+nav button{
+  border:0;
+  padding:11px 22px;
+  border-radius:8px;
+  background:#e2e8f0;
+  color:#334155;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:13px
+}
+nav button.active{background:#0f766e;color:white}
+nav button:hover{background:#0d9488;color:white}
+
+.container{max-width:1500px;margin:auto;padding:20px}
+.section{display:none}
+.section.active{display:block}
+.section-title{
+  font-size:20px;
+  margin:0 0 18px;
+  color:#0f172a
+}
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:13px;
+  margin-bottom:20px
+}
+.summary-card{
+  background:white;
+  border-radius:10px;
+  padding:16px;
+  box-shadow:0 2px 8px #0000000c;
+  border-left:4px solid #0d9488
+}
+.summary-card small{color:#64748b;font-size:12px}
+.summary-card h2{margin:8px 0 0;font-size:25px}
+.feeder-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:14px
+}
+.feeder-card{
+  background:white;
+  border-radius:11px;
+  padding:15px;
+  box-shadow:0 2px 8px #0000000c;
+  border-left:5px solid #94a3b8
+}
+.feeder-card.on{border-left-color:#16a34a}
+.feeder-card.off{border-left-color:#dc2626}
+.feeder-card.disconnected{
+  border-left-color:#9ca3af;
+  background:#e5e7eb;
+  box-shadow:none;
+}
+.feeder-card.disconnected .feeder-name,
+.feeder-card.disconnected .area-list,
+.feeder-card.disconnected .last-change{
+  color:#6b7280;
+}
+.feeder-card.disconnected .status-pill{
+  background:#d1d5db;
+  color:#4b5563;
+}
+.feeder-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px
+}
+.feeder-name{font-weight:bold;font-size:16px}
+.status-pill{
+  padding:5px 11px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:bold
+}
+.status-on{background:#dcfce7;color:#166534}
+.status-off{background:#fee2e2;color:#991b1b}
+.status-unknown{background:#d1d5db;color:#4b5563}
+.area-list{
+  font-size:12px;
+  line-height:1.8;
+  color:#64748b;
+  margin-top:10px;
+  overflow-wrap:anywhere
+}
+.last-change{
+  margin-top:9px;
+  font-size:11px;
+  color:#94a3b8
+}
+.panel{
+  background:white;
+  border-radius:11px;
+  padding:18px;
+  margin-bottom:18px;
+  box-shadow:0 2px 8px #0000000c
+}
+.panel h3{margin:0 0 15px;font-size:16px}
+.sld-wrap{overflow-x:auto}
+.sld-wrap svg{min-width:700px;width:100%;height:auto}
+.sld-label{font-family:Arial,sans-serif;font-size:13px;fill:#334155}
+.sld-line{stroke:#64748b;stroke-width:3;fill:none}
+.sld-live{stroke:#16a34a;stroke-width:4;fill:none}
+.sld-off{stroke:#dc2626;stroke-width:3;fill:none}
+.sld-box{fill:#f8fafc;stroke:#64748b;stroke-width:2}
+.sld-transformer{fill:#fef3c7;stroke:#d97706;stroke-width:2}
+.sld-disconnected{
+  stroke:#9ca3af !important;
+  fill:#e5e7eb !important;
+}
+.sld-disconnected-text{
+  fill:#6b7280 !important;
+}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:600px}
+th,td{
+  text-align:left;
+  padding:11px 12px;
+  border-bottom:1px solid #e2e8f0;
+  font-size:12px
+}
+th{background:#f1f5f9;color:#475569}
+tr:hover td{background:#f8fafc}
+.filter-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:end;
+  gap:12px;
+  margin-bottom:15px
+}
+.filter-row label{font-size:12px;color:#64748b}
+.filter-row input{
+  display:block;
+  padding:9px;
+  border:1px solid #cbd5e1;
+  border-radius:7px;
+  margin-top:5px
+}
+.action-btn{
+  border:0;
+  background:#0f766e;
+  color:white;
+  padding:10px 16px;
+  border-radius:7px;
+  cursor:pointer;
+  font-weight:bold
+}
+.action-btn.secondary{background:#64748b}
+.chart-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:16px
+}
+.chart-box{
+  background:white;
+  border-radius:10px;
+  padding:18px;
+  min-height:300px;
+  box-shadow:0 2px 8px #0000000c
+}
+.chart-box h3{font-size:15px;margin:0 0 15px}
+.warning{
+  display:none;
+  background:#fef3c7;
+  color:#92400e;
+  border:1px solid #fcd34d;
+  padding:11px 14px;
+  border-radius:8px;
+  margin-bottom:15px;
+  font-size:12px
+}
+.error{
+  display:none;
+  background:#fee2e2;
+  color:#991b1b;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:15px;
+  font-size:12px
+}
+.empty{text-align:center;color:#94a3b8;padding:25px}
+footer{
+  text-align:center;
+  padding:20px;
+  font-size:11px;
+  color:#94a3b8
+}
+@media(max-width:600px){
+  header{padding:16px}
+  .header-title h1{font-size:21px}
+  .container{padding:12px}
+  nav button{flex:1;padding:11px 8px;font-size:11px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-title">
+      <h1>Kishoreganj PBS</h1>
+      <p>Kishoreganj-1 (HQ) 20 MVA Substation</p>
+    </div>
+    <div class="info-card">
+      <span class="info-label">BANGLADESH STANDARD TIME</span>
+      <span class="info-value" id="liveClock">Loading...</span>
+    </div>
+  </div>
+
+  <div class="header-info">
+    <div class="info-card">
+      <span class="info-label">LAST UPDATE</span>
+      <span class="info-value" id="lastUpdate">Waiting for data...</span>
+    </div>
+
+    <div class="info-card">
+      <span class="info-label">LAST EVENT</span>
+      <span class="info-value" id="lastEvent">No event received</span>
+    </div>
+
+    <div class="info-card">
+      <span class="info-label">SUBSTATION STATUS</span>
+      <span class="info-value substation-disconnected"
+            id="substationStatus">● CHECKING...</span>
+    </div>
+
+    <div class="info-card">
+      <span class="info-label">FIREBASE CONNECTION</span>
+      <span class="info-value firebase-offline"
+            id="firebaseStatus">● CONNECTING...</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('mapSection',this)">
+    Feeder Map
+  </button>
+  <button onclick="showSection('sldSection',this)">
+    Single Line Diagram
+  </button>
+  <button onclick="showSection('historySection',this)">
+    Event History & Analysis
+  </button>
+</nav>
+
+<div class="container">
+
+  <div id="offlineWarning" class="warning">
+    ⚠ Internet/Firebase connection lost. Showing the last received data.
+    The dashboard will reconnect automatically.
+  </div>
+
+  <div id="firebaseError" class="error"></div>
+
+  <!-- FEEDER MAP -->
+  <section id="mapSection" class="section active">
+
+    <h2 class="section-title">33/11 kV Feeder Status</h2>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <small>Total Feeders</small>
+        <h2 id="totalFeeders">8</h2>
+      </div>
+      <div class="summary-card">
+        <small>Feeders ON</small>
+        <h2 id="onFeeders" style="color:#16a34a">0</h2>
+      </div>
+      <div class="summary-card">
+        <small id="offFeedersLabel">Feeders OFF</small>
+        <h2 id="offFeeders" style="color:#dc2626">0</h2>
+      </div>
+      <div class="summary-card">
+        <small>Availability</small>
+        <h2 id="availability">0%</h2>
+      </div>
+    </div>
+
+    <div class="feeder-grid" id="feederGrid"></div>
+  </section>
+
+  <!-- SINGLE LINE DIAGRAM -->
+  <section id="sldSection" class="section">
+
+    <h2 class="section-title">33/11 kV Substation Single Line Diagram</h2>
+
+    <div class="panel">
+      <div class="sld-wrap">
+        <svg viewBox="0 0 900 560" id="sldSvg">
+
+          <text x="450" y="28" text-anchor="middle"
+                class="sld-label" style="font-weight:bold;font-size:17px">
+            KISHOREGANJ-1 (HQ) 20 MVA SUBSTATION
+          </text>
+
+          <text x="450" y="65" text-anchor="middle" class="sld-label">
+            33 kV INCOMING
+          </text>
+
+          <line id="incomingLine" x1="450" y1="80" x2="450" y2="150"
+                class="sld-off"/>
+
+          <rect id="sldVcb" x="420" y="105" width="60" height="28" rx="4"
+                class="sld-box"/>
+          <text x="450" y="123" text-anchor="middle" class="sld-label">
+            VCB
+          </text>
+
+          <line id="transformerLine" x1="450" y1="150" x2="450" y2="195"
+                class="sld-off"/>
+
+          <rect id="sldTransformer" x="390" y="195" width="120" height="65"
+                rx="8" class="sld-transformer"/>
+          <text x="450" y="221" text-anchor="middle" class="sld-label">
+            POWER TRANSFORMER
+          </text>
+          <text x="450" y="242" text-anchor="middle" class="sld-label">
+            33/11 kV - 20 MVA
+          </text>
+
+          <line id="busFeed" x1="450" y1="260" x2="450" y2="310"
+                class="sld-off"/>
+
+          <line id="busbar" x1="90" y1="310" x2="810" y2="310"
+                class="sld-off" style="stroke-width:7"/>
+
+          <text x="450" y="295" text-anchor="middle" class="sld-label">
+            11 kV BUSBAR
+          </text>
+
+          <g id="sldFeeders"></g>
+
+          <text x="450" y="535" text-anchor="middle"
+                class="sld-label">
+            Feeder status is based on ESP32 input signals
+          </text>
+
+        </svg>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>SLD Status Information</h3>
+      <p style="font-size:12px;color:#64748b;line-height:1.8">
+        Green: Feeder ON &nbsp; | &nbsp;
+        Red: Feeder OFF &nbsp; | &nbsp;
+        Grey: UNKNOWN / COMMUNICATION LOST
+        <br>
+        Incoming, transformer and busbar coloring is illustrative:
+        it indicates whether at least one feeder is ON. It is not an
+        independent breaker or voltage measurement.
+      </p>
+    </div>
+  </section>
+
+  <!-- EVENT HISTORY -->
+  <section id="historySection" class="section">
+
+    <h2 class="section-title">Event History & Analysis</h2>
+
+    <div class="panel">
+      <h3>Event Date Filter</h3>
+
+      <div class="filter-row">
+        <label>
+          From Date
+          <input type="date" id="fromDate">
+        </label>
+
+        <label>
+          To Date
+          <input type="date" id="toDate">
+        </label>
+
+        <button class="action-btn" onclick="applyFilters()">
+          Apply Filter
+        </button>
+
+        <button class="action-btn secondary" onclick="clearFilters()">
+          Clear Filter
+        </button>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <small>Total Events</small>
+          <h2 id="totalEvents">0</h2>
+        </div>
+        <div class="summary-card">
+          <small>Interruption Events</small>
+          <h2 id="totalInterruptions">0</h2>
+        </div>
+        <div class="summary-card">
+          <small>Total Interruption Duration</small>
+          <h2 id="totalDuration">0.00 h</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-box">
+        <h3>Feeder-wise Interruption Count</h3>
+        <canvas id="countChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Feeder-wise Interruption Duration (Hours)</h3>
+        <canvas id="durationChart"></canvas>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:18px">
+      <h3>Event History Table</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SL</th>
+              <th>Date & Time</th>
+              <th>Feeder</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="eventTable">
+            <tr><td colspan="4" class="empty">Waiting for events...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<footer>
+  Kishoreganj Palli Bidyut Samity | Substation Live Monitoring System
+</footer>
+
+<script type="module">
+
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getDatabase,
+  ref,
+  onValue
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+/* FIREBASE CONFIGURATION */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCHUJB83o2CzwGHEN-JnPXJW5RZZRfh-DA",
+  authDomain: "kishoreganj-1-live.firebaseapp.com",
+  databaseURL: "https://kishoreganj-1-live-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kishoreganj-1-live",
+  storageBucket: "kishoreganj-1-live.firebasestorage.app",
+  messagingSenderId: "362129007391",
+  appId: "1:362129007391:web:f241f32c96aedf699a462a",
+  measurementId: "G-B4MGXFNQ8B"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* FEEDER SERVICE AREAS */
+
+const feederAreas = {
+  "Feeder-1": [
+    "মুকসেদপুর",
+    "নতুন পল্লী"
+  ],
+  "Feeder-2": [
+    "তেরহাসিয়া, পুটিপাড়া, বৌলাইবাজার",
+    "দঃরাজকুন্তি, উঃরাজকুন্তি, পাঠানপাড়া, নাকভাঙ্গা, জাল্লাবাদ",
+    "রঘুনন্দনপুর, ভরাটি, ভরাটি চর পাড়া",
+    "রঘুনন্দনপুর, পূর্ব ভরাটি, চেয়ারম্যান বাজার",
+    "রাজকুন্তি, আজিম বাজার, রাশি হাট",
+    "মৈশাখালি",
+    "মৈশাখালি",
+    "পাতালজান, পাটধা",
+    "নয়াপাড়া, গাবতলি, সালজান",
+    "গড়ানিয়ারপাড়, ডিগ্রিকান্দা"
+  ],
+  "Feeder-3": [
+    "মুকসেদপুর, কাশুয়ারচর, মহিনন্দ আগপাড়া",
+    "নয়াপাড়া, বাটুয়ারপাড়, নীলগঞ্জ বাজার",
+    "কাচারীপাড়া, বাজারীপাড়া",
+    "মৈশাকান্দি আওয়ালিয়া বাড়ি, বান্দলদিয়া",
+    "মহিনন্দ নদীরপার, বেলতলি",
+    "মজুমদার পাড়া",
+    "ইসলামপুর",
+    "গালিমগাজী, মহিনন্দ চরপাড়া",
+    "মৈশাকান্দি, বেত্রাটি",
+    "লালস্কুল, বেপারী পাড়া",
+    "তালজাঙ্গা, বেত্রাটি মীরপাড়া",
+    "চৌধুরীহাটি, চেয়ারম্যান বাজার, হাজিরগল",
+    "বরখাপন, জালালপুর",
+    "মহিনন্দ উঃ পাড়া বাস্করখিলা",
+    "মজুমদার পাড়া, চন্দ্রাবতী",
+    "ষ্টেশনঘাট, বাজারি পাড়া নদীরপাড়",
+    "ভাসানিপাড়া",
+    "ভাসানিপাড়া, ইসলামপুর, মিলনগঞ্জবাজার"
+  ],
+  "Feeder-4": [
+    "কাটাবাড়িয়া",
+    "বড়ভাগ",
+    "ভাটগাও",
+    "আলমপুর",
+    "সাদুল্লাহ",
+    "ব্রাহ্মনকচুরী"
+  ],
+  "Feeder-5": [
+    "সগড়া, রশিদাবাদ, লতিবপুর, শ্রীমন্তপুর, বারতোপা",
+    "লতিবপুর, শ্রীমন্তপুর",
+    "বারতোপা, শিমুলিয়া, কাকতৈল, ছফিলা, রামদিয়া"
+  ],
+  "Feeder-6": [
+    "মুকসেদপুর, লতিবাবাদ, পাবইকান্দি, লক্ষীগঞ্জ, বেরুয়াইল",
+    "সগড়া, রশিদাবাদ, কাকতৈল, ভূইয়াবাড়ি",
+    "ঝাটাসিড়া, খিলপাড়া, পাঠানকান্দি, কাতিয়ারচর",
+    "প্যারাভাঙ্গা, কুট্রাগড়, দনাইল"
+  ],
+  "Feeder-7": [
+    "মুকসেদপুর, পাসপোর্ট অফিস"
+  ],
+  "Feeder-8": [
+    "মুকসেদপুর, খিরদাবাজার, ভদ্রপাড়া, কলাপাড়া, বাদেশোলাকিয়া, হাজরাদী, রগুখালী, বৌলাই",
+    "চং শোলাকিয়া, গাংগাইল"
+  ]
+};
+
+const feederNames = Object.keys(feederAreas);
+
+let feederData = {};
+let eventData = [];
+let filteredEvents = [];
+let substationLastSeenMs = 0;
+let firebaseConnected = false;
+let countChart = null;
+let durationChart = null;
+
+/*
+  Connectivity intervals are stored locally in this browser.
+  Outage duration is accumulated only during intervals when:
+  1) Firebase is connected, and
+  2) the ESP32 heartbeat is fresh.
+*/
+
+const FEEDER_CACHE = "kpbshq_feeder_cache";
+const EVENT_CACHE = "kpbshq_event_cache";
+const ONLINE_INTERVAL_CACHE = "kpbshq_online_intervals_v2";
+
+let onlineIntervals = [];
+let onlineStartMs = 0;
+let lastSubstationConnected = null;
+
+const heartbeatValues = {
+  rootTimestamp: 0,
+  heartbeatTimestamp: 0,
+  metaLastSeen: 0
+};
+
+try {
+  const savedIntervals = localStorage.getItem(ONLINE_INTERVAL_CACHE);
+  if (savedIntervals) {
+    const parsed = JSON.parse(savedIntervals);
+    if (Array.isArray(parsed)) {
+      onlineIntervals = parsed
+        .filter(item => Array.isArray(item) &&
+          Number.isFinite(Number(item[0])) &&
+          Number.isFinite(Number(item[1])) &&
+          Number(item[1]) > Number(item[0]))
+        .map(item => [Number(item[0]), Number(item[1])]);
+    }
+  }
+} catch (error) {
+  console.warn("Could not restore online intervals:", error);
+}
+
+/* TIME FUNCTIONS */
+
+function timestampToMs(value) {
+  if (value === null || value === undefined || value === "") return 0;
+
+  if (typeof value === "string" && !/^\d+(\.\d+)?$/.test(value.trim())) {
+    const parsedDate = Date.parse(value);
+    return Number.isFinite(parsedDate) ? parsedDate : 0;
+  }
+
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) return 0;
+
+  // Accept Unix seconds or Unix milliseconds.
+  return number < 100000000000 ? number * 1000 : number;
+}
+
+function bdTime(timestamp) {
+  if (!timestamp) return "N/A";
+
+  const date = new Date(timestampToMs(timestamp));
+  if (Number.isNaN(date.getTime())) return "N/A";
+
+  return date.toLocaleString("en-GB", {
+    timeZone: "Asia/Dhaka",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+}
+
+function updateClock() {
+  document.getElementById("liveClock").textContent =
+    new Date().toLocaleString("en-GB", {
+      timeZone: "Asia/Dhaka",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
+    });
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+/* NAVIGATION */
+
+window.showSection = function(sectionId, button) {
+  document.querySelectorAll(".section").forEach(section => {
+    section.classList.remove("active");
+  });
+
+  document.getElementById(sectionId).classList.add("active");
+
+  document.querySelectorAll("nav button").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  button.classList.add("active");
+
+  if (sectionId === "historySection") {
+    renderCharts();
+  }
+};
+
+/* FIREBASE CONNECTION STATUS */
+
+function updateFirebaseStatus() {
+  const element = document.getElementById("firebaseStatus");
+  const warning = document.getElementById("offlineWarning");
+
+  if (firebaseConnected) {
+    element.textContent = "● CONNECTED";
+    element.className = "info-value firebase-online";
+    warning.style.display = "none";
+  } else {
+    element.textContent = "● DISCONNECTED";
+    element.className = "info-value firebase-offline";
+    warning.style.display = "block";
+  }
+}
+
+onValue(ref(db, ".info/connected"), snapshot => {
+  firebaseConnected = snapshot.val() === true;
+  updateFirebaseStatus();
+  updateSubstationStatus();
+});
+
+/* SUBSTATION HEARTBEAT STATUS */
+
+function refreshHeartbeatTime() {
+  substationLastSeenMs = Math.max(
+    timestampToMs(heartbeatValues.rootTimestamp),
+    timestampToMs(heartbeatValues.heartbeatTimestamp),
+    timestampToMs(heartbeatValues.metaLastSeen)
+  );
+
+  updateSubstationStatus();
+}
+
+function listenForHeartbeat(path, key) {
+  onValue(ref(db, path), snapshot => {
+    heartbeatValues[key] = snapshot.val();
+    refreshHeartbeatTime();
+  }, error => handleFirebaseError(error));
+}
+
+listenForHeartbeat("Timestamp", "rootTimestamp");
+listenForHeartbeat("Substation/Heartbeat/Timestamp", "heartbeatTimestamp");
+listenForHeartbeat("Substation/Meta/lastSeen", "metaLastSeen");
+
+function isSubstationConnected() {
+  const ageMs = Date.now() - substationLastSeenMs;
+
+  return (
+    firebaseConnected &&
+    substationLastSeenMs > 0 &&
+    ageMs >= -5000 &&
+    ageMs <= 45000
+  );
+}
+
+function saveOnlineIntervals() {
+  if (onlineIntervals.length > 10000) {
+    onlineIntervals = onlineIntervals.slice(-10000);
+  }
+
+  try {
+    localStorage.setItem(
+      ONLINE_INTERVAL_CACHE,
+      JSON.stringify(onlineIntervals)
+    );
+  } catch (error) {
+    console.warn("Could not save online intervals:", error);
+  }
+}
+
+function updateOnlineIntervalState(connected) {
+  const now = Date.now();
+
+  if (connected && lastSubstationConnected !== true) {
+    onlineStartMs = now;
+  } else if (!connected && lastSubstationConnected === true) {
+    if (onlineStartMs > 0 && now > onlineStartMs) {
+      onlineIntervals.push([onlineStartMs, now]);
+      saveOnlineIntervals();
+    }
+    onlineStartMs = 0;
+  }
+
+  lastSubstationConnected = connected;
+}
+
+function updateSubstationStatus() {
+  const element = document.getElementById("substationStatus");
+  const connected = isSubstationConnected();
+
+  updateOnlineIntervalState(connected);
+
+  if (connected) {
+    element.textContent = "● SUBSTATION CONNECTED";
+    element.className = "info-value substation-connected";
+  } else {
+    element.textContent = "● SUBSTATION DISCONNECTED";
+    element.className = "info-value substation-disconnected";
+  }
+
+  renderFeeders();
+
+  if (document.getElementById("historySection")?.classList.contains("active")) {
+    renderCharts();
+  }
+}
+
+setInterval(updateSubstationStatus, 5000);
+
+/* LAST UPDATE */
+
+function markDataReceived() {
+  document.getElementById("lastUpdate").textContent =
+    new Date().toLocaleTimeString("en-GB", {
+      timeZone: "Asia/Dhaka",
+      hour12: true
+    });
+}
+
+/* STATUS NORMALIZATION */
+
+function isFeederOn(value) {
+  if (value === true || value === 1) return true;
+
+  const text = String(value ?? "").trim().toUpperCase();
+
+  return ["ON", "HIGH", "TRUE", "1"].includes(text);
+}
+
+function getStatus(value) {
+  return isFeederOn(value) ? "ON" : "OFF";
+}
+
+/* FEEDER MAP */
+
+function renderFeeders() {
+  const grid = document.getElementById("feederGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  const substationOnline = isSubstationConnected();
+  let onCount = 0;
+  let offCount = 0;
+  let unknownCount = 0;
+
+  feederNames.forEach(name => {
+    const data = feederData[name] || {};
+    const actualOn = isFeederOn(data.Status);
+
+    const status = !substationOnline
+      ? "UNKNOWN"
+      : (actualOn ? "ON" : "OFF");
+
+    if (status === "ON") onCount++;
+    else if (status === "OFF") offCount++;
+    else unknownCount++;
+
+    const card = document.createElement("div");
+
+    card.className = "feeder-card " +
+      (!substationOnline
+        ? "disconnected"
+        : (actualOn ? "on" : "off"));
+
+    const head = document.createElement("div");
+    head.className = "feeder-head";
+
+    const feederTitle = document.createElement("span");
+    feederTitle.className = "feeder-name";
+    feederTitle.textContent = name;
+
+    const pill = document.createElement("span");
+
+    if (!substationOnline) {
+      pill.className = "status-pill status-unknown";
+      pill.textContent = "● UNKNOWN";
+    } else {
+      pill.className = "status-pill " +
+        (actualOn ? "status-on" : "status-off");
+      pill.textContent = actualOn ? "● ON" : "● OFF";
+    }
+
+    head.append(feederTitle, pill);
+
+    const areas = document.createElement("div");
+    areas.className = "area-list";
+    areas.textContent = feederAreas[name].join(" | ");
+
+    const lastChange = document.createElement("div");
+    lastChange.className = "last-change";
+
+    lastChange.textContent = !substationOnline
+      ? "UNKNOWN / COMMUNICATION LOST"
+      : "Last Change: " + (data.LastChange || "N/A");
+
+    card.append(head, areas, lastChange);
+    grid.appendChild(card);
+  });
+
+  document.getElementById("totalFeeders").textContent = 8;
+  document.getElementById("onFeeders").textContent = onCount;
+  document.getElementById("offFeeders").textContent =
+    substationOnline ? offCount : unknownCount;
+
+  document.getElementById("offFeedersLabel").textContent =
+    substationOnline ? "Feeders OFF" : "Feeders UNKNOWN";
+
+  document.getElementById("availability").textContent =
+    substationOnline
+      ? ((onCount / 8) * 100).toFixed(1) + "%"
+      : "UNKNOWN";
+
+  const summaryCards = document.querySelectorAll(
+    "#mapSection .summary-card"
+  );
+
+  summaryCards.forEach(card => {
+    card.style.borderLeftColor =
+      substationOnline ? "" : "#9ca3af";
+
+    card.style.background =
+      substationOnline ? "" : "#e5e7eb";
+  });
+
+  document.getElementById("onFeeders").style.color =
+    substationOnline ? "#16a34a" : "#6b7280";
+
+  document.getElementById("offFeeders").style.color =
+    substationOnline ? "#dc2626" : "#6b7280";
+
+  document.getElementById("availability").style.color =
+    substationOnline ? "" : "#6b7280";
+
+  renderSLD();
+}
+
+/* SINGLE LINE DIAGRAM */
+
+function renderSLD() {
+  const svgGroup = document.getElementById("sldFeeders");
+  if (!svgGroup) return;
+
+  svgGroup.innerHTML = "";
+
+  const substationOnline = isSubstationConnected();
+
+  const anyOn = substationOnline && feederNames.some(name =>
+    isFeederOn(feederData[name]?.Status)
+  );
+
+  const mainClass = !substationOnline
+    ? "sld-disconnected"
+    : (anyOn ? "sld-live" : "sld-off");
+
+  ["incomingLine", "transformerLine", "busFeed", "busbar"].forEach(id => {
+    document.getElementById(id).setAttribute("class", mainClass);
+  });
+
+  document.getElementById("sldTransformer").setAttribute(
+    "class",
+    substationOnline ? "sld-transformer" : "sld-disconnected"
+  );
+
+  document.getElementById("sldVcb").setAttribute(
+    "class",
+    substationOnline ? "sld-box" : "sld-disconnected"
+  );
+
+  document.querySelectorAll("#sldSvg .sld-label").forEach(label => {
+    label.classList.toggle(
+      "sld-disconnected-text",
+      !substationOnline
+    );
+  });
+
+  feederNames.forEach((name, index) => {
+    const x = 90 + index * 102.5;
+
+    const on = substationOnline &&
+      isFeederOn(feederData[name]?.Status);
+
+    const color = !substationOnline
+      ? "#9ca3af"
+      : (on ? "#16a34a" : "#dc2626");
+
+    const group = document.createElementNS(
+      "http://www.w3.org/2000/svg", "g"
+    );
+
+    const line = document.createElementNS(
+      "http://www.w3.org/2000/svg", "line"
+    );
+
+    line.setAttribute("x1", x);
+    line.setAttribute("y1", 310);
+    line.setAttribute("x2", x);
+    line.setAttribute("y2", 390);
+    line.setAttribute("stroke", color);
+    line.setAttribute("stroke-width", "4");
+
+    const breaker = document.createElementNS(
+      "http://www.w3.org/2000/svg", "rect"
+    );
+
+    breaker.setAttribute("x", x - 20);
+    breaker.setAttribute("y", 340);
+    breaker.setAttribute("width", 40);
+    breaker.setAttribute("height", 25);
+    breaker.setAttribute("rx", 4);
+
+    breaker.setAttribute(
+      "fill",
+      !substationOnline
+        ? "#e5e7eb"
+        : (on ? "#dcfce7" : "#fee2e2")
+    );
+
+    breaker.setAttribute("stroke", color);
+    breaker.setAttribute("stroke-width", "2");
+
+    const feederText = document.createElementNS(
+      "http://www.w3.org/2000/svg", "text"
+    );
+
+    feederText.setAttribute("x", x);
+    feederText.setAttribute("y", 415);
+    feederText.setAttribute("text-anchor", "middle");
+    feederText.setAttribute("class", "sld-label");
+    feederText.textContent = "F-" + (index + 1);
+
+    if (!substationOnline) {
+      feederText.classList.add("sld-disconnected-text");
+    }
+
+    const statusText = document.createElementNS(
+      "http://www.w3.org/2000/svg", "text"
+    );
+
+    statusText.setAttribute("x", x);
+    statusText.setAttribute("y", 435);
+    statusText.setAttribute("text-anchor", "middle");
+    statusText.setAttribute("font-size", "10");
+    statusText.setAttribute("fill", color);
+    statusText.textContent = on ? "ON" :
+      (substationOnline ? "OFF" : "UNKNOWN");
+
+    group.append(line, breaker, feederText, statusText);
+    svgGroup.appendChild(group);
+  });
+}
+
+/* FEEDER REALTIME DATA */
+
+onValue(ref(db, "Substation/Feeders"), snapshot => {
+  const data = snapshot.val();
+
+  if (data) {
+    feederData = data;
+    localStorage.setItem(FEEDER_CACHE, JSON.stringify(data));
+    renderFeeders();
+    markDataReceived();
+  }
+}, error => handleFirebaseError(error));
+
+/* EVENT DATA */
+
+onValue(ref(db, "Substation/Events"), snapshot => {
+  const data = snapshot.val() || {};
+
+  eventData = Object.entries(data).map(([key, value]) => ({
+    id: key,
+    ...value
+  }));
+
+  eventData.sort((a, b) => getTimestamp(b) - getTimestamp(a));
+
+  localStorage.setItem(EVENT_CACHE, JSON.stringify(eventData));
+
+  renderLastEvent();
+  applyFilters();
+  markDataReceived();
+
+}, error => handleFirebaseError(error));
+
+function getTimestamp(event) {
+  if (event.Timestamp) return timestampToMs(event.Timestamp) / 1000;
+
+  if (event.timestamp) return timestampToMs(event.timestamp) / 1000;
+
+  if (event.DateTime) {
+    const parsed = Date.parse(event.DateTime);
+    if (!isNaN(parsed)) return parsed / 1000;
+  }
+
+  return 0;
+}
+
+function renderLastEvent() {
+  const element = document.getElementById("lastEvent");
+
+  if (!eventData.length) {
+    element.textContent = "No event received";
+    return;
+  }
+
+  const event = eventData[0];
+
+  element.textContent =
+    (event.Feeder || "Unknown") + " " +
+    getStatus(event.Status) + " | " +
+    (event.DateTime || bdTime(getTimestamp(event)));
+}
+
+/* EVENT FILTER */
+
+window.applyFilters = function() {
+  const from = document.getElementById("fromDate").value;
+  const to = document.getElementById("toDate").value;
+
+  const fromTime = from
+    ? new Date(from + "T00:00:00+06:00").getTime() / 1000
+    : 0;
+
+  const toTime = to
+    ? new Date(to + "T23:59:59+06:00").getTime() / 1000
+    : Infinity;
+
+  filteredEvents = eventData.filter(event => {
+    const time = getTimestamp(event);
+    return time >= fromTime && time <= toTime;
+  });
+
+  renderEventTable();
+  renderCharts();
+};
+
+window.clearFilters = function() {
+  document.getElementById("fromDate").value = "";
+  document.getElementById("toDate").value = "";
+  applyFilters();
+};
+
+/* Update the live outage-duration chart periodically while it is visible. */
+
+setInterval(() => {
+  if (document.getElementById("historySection")?.classList.contains("active")) {
+    renderCharts();
+  }
+}, 10000);
+
+/* EVENT TABLE */
+
+function renderEventTable() {
+  const tbody = document.getElementById("eventTable");
+  tbody.innerHTML = "";
+
+  document.getElementById("totalEvents").textContent =
+    filteredEvents.length;
+
+  if (!filteredEvents.length) {
+    tbody.innerHTML =
+      '<tr><td colspan="4" class="empty">No events found</td></tr>';
+    return;
+  }
+
+  filteredEvents.forEach((event, index) => {
+    const tr = document.createElement("tr");
+
+    const values = [
+      index + 1,
+      event.DateTime || bdTime(getTimestamp(event)),
+      event.Feeder || "Unknown",
+      getStatus(event.Status)
+    ];
+
+    values.forEach((value, i) => {
+      const td = document.createElement("td");
+      td.textContent = value;
+
+      if (i === 3) {
+        td.style.fontWeight = "bold";
+        td.style.color = value === "ON" ? "#16a34a" : "#dc2626";
+      }
+
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+/* INTERRUPTION COUNT AND DURATION */
+
+function getObservedOnlineIntervals() {
+  const intervals = [...onlineIntervals];
+
+  if (isSubstationConnected() && onlineStartMs > 0) {
+    intervals.push([onlineStartMs, Date.now()]);
+  }
+
+  return intervals;
+}
+
+function connectedSecondsBetween(startSeconds, endSeconds) {
+  if (!(endSeconds > startSeconds)) return 0;
+
+  const startMs = startSeconds * 1000;
+  const endMs = endSeconds * 1000;
+  const intervals = getObservedOnlineIntervals();
+
+  let totalMs = 0;
+
+  intervals.forEach(([onlineFrom, onlineTo]) => {
+    const overlapStart = Math.max(startMs, onlineFrom);
+    const overlapEnd = Math.min(endMs, onlineTo);
+
+    if (overlapEnd > overlapStart) {
+      totalMs += overlapEnd - overlapStart;
+    }
+  });
+
+  return totalMs / 1000;
+}
+
+/* INTERRUPTION COUNT AND CONNECTED-TIME DURATION */
+
+function calculateOutages() {
+  const counts = {};
+  const durations = {};
+
+  feederNames.forEach(name => {
+    counts[name] = 0;
+    durations[name] = 0;
+  });
+
+  const sorted = [...eventData].sort(
+    (a, b) => getTimestamp(a) - getTimestamp(b)
+  );
+
+  const openOutages = {};
+
+  const from = document.getElementById("fromDate").value;
+  const to = document.getElementById("toDate").value;
+
+  const rangeStart = from
+    ? new Date(from + "T00:00:00+06:00").getTime() / 1000
+    : 0;
+
+  const rangeEnd = to
+    ? new Date(to + "T23:59:59+06:00").getTime() / 1000
+    : Date.now() / 1000;
+
+  function addConnectedDuration(feeder, start, end) {
+    const clippedStart = Math.max(start, rangeStart);
+    const clippedEnd = Math.min(end, rangeEnd);
+
+    if (clippedEnd > clippedStart) {
+      durations[feeder] +=
+        connectedSecondsBetween(clippedStart, clippedEnd) / 3600;
+    }
+  }
+
+  sorted.forEach(event => {
+    const feeder = event.Feeder;
+    if (!feeder || !(feeder in counts)) return;
+
+    const timestamp = getTimestamp(event);
+    if (!timestamp) return;
+
+    const status = getStatus(event.Status);
+
+    if (status === "OFF") {
+      if (timestamp >= rangeStart && timestamp <= rangeEnd) {
+        counts[feeder]++;
+      }
+
+      if (openOutages[feeder] === undefined) {
+        openOutages[feeder] = timestamp;
+      }
+
+    } else if (status === "ON") {
+      if (openOutages[feeder] !== undefined) {
+        addConnectedDuration(
+          feeder,
+          openOutages[feeder],
+          timestamp
+        );
+        delete openOutages[feeder];
+      }
+    }
+  });
+
+  Object.entries(openOutages).forEach(([feeder, start]) => {
+    addConnectedDuration(
+      feeder,
+      start,
+      Math.min(Date.now() / 1000, rangeEnd)
+    );
+  });
+
+  const totalInterruptions = Object.values(counts)
+    .reduce((a, b) => a + b, 0);
+
+  const totalHours = Object.values(durations)
+    .reduce((a, b) => a + b, 0);
+
+  document.getElementById("totalInterruptions").textContent =
+    totalInterruptions;
+
+  document.getElementById("totalDuration").textContent =
+    totalHours.toFixed(2) + " h";
+
+  return { counts, durations };
+}
+
+/* CHARTS */
+
+function renderCharts() {
+  const { counts, durations } = calculateOutages();
+
+  const labels = feederNames.map(name =>
+    name.replace("Feeder-", "F-")
+  );
+
+  if (countChart) countChart.destroy();
+  if (durationChart) durationChart.destroy();
+
+  countChart = new Chart(
+    document.getElementById("countChart"),
+    {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "Interruption Count",
+          data: feederNames.map(name => counts[name]),
+          backgroundColor: "#ef4444",
+          borderRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    }
+  );
+
+  durationChart = new Chart(
+    document.getElementById("durationChart"),
+    {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "Duration (Hours)",
+          data: feederNames.map(name =>
+            Number(durations[name].toFixed(2))
+          ),
+          backgroundColor: "#0d9488",
+          borderRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    }
+  );
+}
+
+/* FIREBASE ERROR */
+
+function handleFirebaseError(error) {
+  console.error("Firebase error:", error);
+
+  const box = document.getElementById("firebaseError");
+  box.style.display = "block";
+
+  if (error.code === "PERMISSION_DENIED") {
+    box.textContent =
+      "Firebase permission denied. Please check your Realtime Database read rules.";
+  } else {
+    box.textContent =
+      "Firebase error: " + (error.message || "Unable to read database.");
+  }
+}
+
+/* RESTORE LAST RECEIVED DATA FROM BROWSER CACHE */
+
+try {
+  const savedFeeders = localStorage.getItem(FEEDER_CACHE);
+
+  if (savedFeeders) {
+    feederData = JSON.parse(savedFeeders);
+    renderFeeders();
+  }
+
+  const savedEvents = localStorage.getItem(EVENT_CACHE);
+
+  if (savedEvents) {
+    eventData = JSON.parse(savedEvents);
+    eventData.sort((a, b) => getTimestamp(b) - getTimestamp(a));
+    renderLastEvent();
+    applyFilters();
+  }
+
+} catch (error) {
+  console.error("Cache restore error:", error);
+}
+
+/* INITIAL STATUS CHECK */
+
+updateSubstationStatus();
+
+</script>
+
+</body>
+</html>
