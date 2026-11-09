@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,6 +115,8 @@ nav button:hover{background:#0d9488;color:white}
 }
 .feeder-card.on{border-left-color:#16a34a}
 .feeder-card.off{border-left-color:#dc2626}
+
+/* DISCONNECTED / UNKNOWN FEEDER STYLE */
 .feeder-card.disconnected{
   border-left-color:#9ca3af;
   background:#e5e7eb;
@@ -128,6 +131,7 @@ nav button:hover{background:#0d9488;color:white}
   background:#d1d5db;
   color:#4b5563;
 }
+
 .feeder-head{
   display:flex;
   justify-content:space-between;
@@ -144,6 +148,7 @@ nav button:hover{background:#0d9488;color:white}
 .status-on{background:#dcfce7;color:#166534}
 .status-off{background:#fee2e2;color:#991b1b}
 .status-unknown{background:#d1d5db;color:#4b5563}
+
 .area-list{
   font-size:12px;
   line-height:1.8;
@@ -172,6 +177,7 @@ nav button:hover{background:#0d9488;color:white}
 .sld-off{stroke:#dc2626;stroke-width:3;fill:none}
 .sld-box{fill:#f8fafc;stroke:#64748b;stroke-width:2}
 .sld-transformer{fill:#fef3c7;stroke:#d97706;stroke-width:2}
+
 .sld-disconnected{
   stroke:#9ca3af !important;
   fill:#e5e7eb !important;
@@ -179,6 +185,7 @@ nav button:hover{background:#0d9488;color:white}
 .sld-disconnected-text{
   fill:#6b7280 !important;
 }
+
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:600px}
 th,td{
@@ -604,18 +611,17 @@ const feederNames = Object.keys(feederAreas);
 let feederData = {};
 let eventData = [];
 let filteredEvents = [];
-let substationLastSeenMs = 0;
 let firebaseConnected = false;
+let feederDataLoaded = false;
 let countChart = null;
 let durationChart = null;
 
 /*
   Connectivity intervals are stored locally in this browser.
-  Outage duration is accumulated only during intervals when:
-  1) Firebase is connected, and
-  2) the ESP32 heartbeat is fresh.
+  Outage duration is accumulated only while Firebase is connected
+  and the live feeder snapshot is available. This is browser-observed
+  data availability, not independent ESP32 heartbeat verification.
 */
-
 const FEEDER_CACHE = "kpbshq_feeder_cache";
 const EVENT_CACHE = "kpbshq_event_cache";
 const ONLINE_INTERVAL_CACHE = "kpbshq_online_intervals_v2";
@@ -623,13 +629,6 @@ const ONLINE_INTERVAL_CACHE = "kpbshq_online_intervals_v2";
 let onlineIntervals = [];
 let onlineStartMs = 0;
 let lastSubstationConnected = null;
-
-const heartbeatValues = {
-  rootTimestamp: 0,
-  heartbeatTimestamp: 0,
-  metaLastSeen: 0
-};
-
 try {
   const savedIntervals = localStorage.getItem(ONLINE_INTERVAL_CACHE);
   if (savedIntervals) {
@@ -713,10 +712,6 @@ window.showSection = function(sectionId, button) {
   });
 
   button.classList.add("active");
-
-  if (sectionId === "historySection") {
-    renderCharts();
-  }
 };
 
 /* FIREBASE CONNECTION STATUS */
@@ -738,45 +733,28 @@ function updateFirebaseStatus() {
 
 onValue(ref(db, ".info/connected"), snapshot => {
   firebaseConnected = snapshot.val() === true;
+
+  // Do not keep displaying cached feeder values as live after Firebase drops.
+  if (!firebaseConnected) feederDataLoaded = false;
+
   updateFirebaseStatus();
   updateSubstationStatus();
 });
 
-/* SUBSTATION HEARTBEAT STATUS */
+/* SUBSTATION / LIVE DATA STATUS — NO HEARTBEAT REQUIRED */
 
-function refreshHeartbeatTime() {
-  substationLastSeenMs = Math.max(
-    timestampToMs(heartbeatValues.rootTimestamp),
-    timestampToMs(heartbeatValues.heartbeatTimestamp),
-    timestampToMs(heartbeatValues.metaLastSeen)
-  );
-
-  updateSubstationStatus();
-}
-
-function listenForHeartbeat(path, key) {
-  onValue(ref(db, path), snapshot => {
-    heartbeatValues[key] = snapshot.val();
-    refreshHeartbeatTime();
-  }, error => handleFirebaseError(error));
-}
-
-listenForHeartbeat("Timestamp", "rootTimestamp");
-listenForHeartbeat("Substation/Heartbeat/Timestamp", "heartbeatTimestamp");
-listenForHeartbeat("Substation/Meta/lastSeen", "metaLastSeen");
-
+/*
+  This dashboard uses the Firebase connection state plus the presence
+  of the live feeder snapshot. It does not read any heartbeat/timestamp
+  path. This confirms that the dashboard can read feeder data from
+  Firebase; it does NOT independently prove that the ESP32 is online.
+*/
 function isSubstationConnected() {
-  const ageMs = Date.now() - substationLastSeenMs;
-
-  return (
-    firebaseConnected &&
-    substationLastSeenMs > 0 &&
-    ageMs >= -5000 &&
-    ageMs <= 45000
-  );
+  return firebaseConnected && feederDataLoaded;
 }
 
 function saveOnlineIntervals() {
+  // Keep the cache bounded while retaining a long useful history.
   if (onlineIntervals.length > 10000) {
     onlineIntervals = onlineIntervals.slice(-10000);
   }
@@ -795,8 +773,10 @@ function updateOnlineIntervalState(connected) {
   const now = Date.now();
 
   if (connected && lastSubstationConnected !== true) {
+    // Start counting when this browser confirms Firebase and feeder data are available.
     onlineStartMs = now;
   } else if (!connected && lastSubstationConnected === true) {
+    // Close the online interval. No outage time accrues after this point.
     if (onlineStartMs > 0 && now > onlineStartMs) {
       onlineIntervals.push([onlineStartMs, now]);
       saveOnlineIntervals();
@@ -822,7 +802,7 @@ function updateSubstationStatus() {
   }
 
   renderFeeders();
-
+  // Refresh duration analysis when connectivity changes.
   if (document.getElementById("historySection")?.classList.contains("active")) {
     renderCharts();
   }
@@ -869,8 +849,10 @@ function renderFeeders() {
 
   feederNames.forEach(name => {
     const data = feederData[name] || {};
+
     const actualOn = isFeederOn(data.Status);
 
+    // Do not report stale readings as actual OFF.
     const status = !substationOnline
       ? "UNKNOWN"
       : (actualOn ? "ON" : "OFF");
@@ -1078,12 +1060,23 @@ function renderSLD() {
 onValue(ref(db, "Substation/Feeders"), snapshot => {
   const data = snapshot.val();
 
+  // Consider the live feeder data ready only when all 8 feeder Status
+  // values are present. No heartbeat or timestamp is checked.
+  feederDataLoaded = !!data && feederNames.every(name =>
+    data[name] && data[name].Status !== undefined && data[name].Status !== null
+  );
+
   if (data) {
     feederData = data;
-    localStorage.setItem(FEEDER_CACHE, JSON.stringify(data));
-    renderFeeders();
-    markDataReceived();
+    try {
+      localStorage.setItem(FEEDER_CACHE, JSON.stringify(data));
+    } catch (error) {
+      console.warn("Could not cache feeder data:", error);
+    }
   }
+
+  updateSubstationStatus();
+  markDataReceived();
 }, error => handleFirebaseError(error));
 
 /* EVENT DATA */
@@ -1165,7 +1158,6 @@ window.clearFilters = function() {
 };
 
 /* Update the live outage-duration chart periodically while it is visible. */
-
 setInterval(() => {
   if (document.getElementById("historySection")?.classList.contains("active")) {
     renderCharts();
@@ -1218,6 +1210,7 @@ function renderEventTable() {
 function getObservedOnlineIntervals() {
   const intervals = [...onlineIntervals];
 
+  // Include the active interval while Firebase and feeder data are available.
   if (isSubstationConnected() && onlineStartMs > 0) {
     intervals.push([onlineStartMs, Date.now()]);
   }
@@ -1314,6 +1307,7 @@ function calculateOutages() {
     }
   });
 
+  // An ongoing outage accrues duration only during observed data-available intervals.
   Object.entries(openOutages).forEach(([feeder, start]) => {
     addConnectedDuration(
       feeder,
