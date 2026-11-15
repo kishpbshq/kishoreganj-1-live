@@ -363,10 +363,13 @@ footer{text-align:center;padding:20px;font-size:11px;color:#94a3b8}
   </div>
 
   <div class="header-info">
-    <div class="info-card">
-      <span class="info-label">LAST UPDATE</span>
-      <span class="info-value" id="lastUpdate">Waiting for data...</span>
-    </div>
+   <div class="info-card">
+  <span class="info-label">LAST HEARTBEAT RECEIVED</span>
+  <span class="info-value" id="lastUpdate">Waiting for heartbeat...</span>
+  <span id="lastUpdateAgo" style="display:block;font-size:12px;color:#cbd5e1;margin-top:6px;">
+    Waiting...
+  </span>
+   </div>
     <div class="info-card">
       <span class="info-label">LAST EVENT</span>
       <span class="info-value" id="lastEvent">No event received</span>
@@ -786,6 +789,7 @@ function updateClock() {
       second: "2-digit",
       hour12: true
     });
+  updateHeartbeatDisplay();
 }
 
 setInterval(updateClock, 1000);
@@ -859,6 +863,7 @@ onValue(ref(db, "Substation/Meta/HeartbeatCounter"), snapshot => {
     } else if (value !== lastHeartbeatValue) {
       lastHeartbeatValue = value;
       lastHeartbeatAt = Date.now();
+       updateHeartbeatDisplay();
     }
   } else if (!heartbeatInitialized) {
     heartbeatInitialized = true;
@@ -952,14 +957,45 @@ function updateSubstationStatus() {
 
 setInterval(updateSubstationStatus, 1000);
 
-/* LAST UPDATE */
+/* LAST HEARTBEAT RECEIVED TIME */
 
-function markDataReceived() {
-  document.getElementById("lastUpdate").textContent =
-    new Date().toLocaleTimeString("en-GB", {
+function updateHeartbeatDisplay() {
+  const timeElement = document.getElementById("lastUpdate");
+  const agoElement = document.getElementById("lastUpdateAgo");
+
+  if (!lastHeartbeatAt) {
+    timeElement.textContent = "Waiting for heartbeat...";
+    agoElement.textContent = "No heartbeat received yet";
+    return;
+  }
+
+  const now = Date.now();
+  const elapsed = Math.max(0, Math.floor((now - lastHeartbeatAt) / 1000));
+
+  timeElement.textContent = new Date(lastHeartbeatAt).toLocaleTimeString(
+    "en-GB",
+    {
       timeZone: "Asia/Dhaka",
       hour12: true
-    });
+    }
+  );
+
+  let agoText;
+
+  if (elapsed < 60) {
+    agoText = elapsed + (elapsed === 1 ? " sec ago" : " secs ago");
+  } else if (elapsed < 3600) {
+    const minutes = Math.floor(elapsed / 60);
+    agoText = minutes + (minutes === 1 ? " min ago" : " mins ago");
+  } else if (elapsed < 86400) {
+    const hours = Math.floor(elapsed / 3600);
+    agoText = hours + (hours === 1 ? " hr ago" : " hrs ago");
+  } else {
+    const days = Math.floor(elapsed / 86400);
+    agoText = days + (days === 1 ? " day ago" : " days ago");
+  }
+
+  agoElement.textContent = "Last heartbeat " + agoText;
 }
 
 /* STATUS NORMALIZATION */
