@@ -862,7 +862,7 @@ onValue(ref(db, "Substation/Meta/HeartbeatCounter"), snapshot => {
       lastHeartbeatValue = value;
     } else if (value !== lastHeartbeatValue) {
       lastHeartbeatValue = value;
-      lastHeartbeatAt = Date.now();
+      
        updateHeartbeatDisplay();
     }
   } else if (!heartbeatInitialized) {
@@ -873,7 +873,29 @@ onValue(ref(db, "Substation/Meta/HeartbeatCounter"), snapshot => {
   updateSubstationStatus();
 
 }, error => handleFirebaseError(error, "Heartbeat"));
+// ==================================================
+// LAST HEARTBEAT TIME FROM FIREBASE
+// ==================================================
 
+const heartbeatTimeRef = ref(
+  db,
+  "Substation/Meta/LastHeartbeatTime"
+);
+
+onValue(heartbeatTimeRef, (snapshot) => {
+
+  const timestamp = Number(snapshot.val());
+
+  if (timestamp > 0) {
+
+    // Firebase timestamp is in seconds.
+    // JavaScript Date uses milliseconds.
+    lastHeartbeatAt = timestamp * 1000;
+
+    updateHeartbeatDisplay();
+  }
+
+});
 /* SUBSTATION STATUS */
 
 function isSubstationConnected() {
@@ -960,39 +982,56 @@ setInterval(updateSubstationStatus, 1000);
 /* LAST HEARTBEAT RECEIVED TIME */
 
 function updateHeartbeatDisplay() {
+
   const timeElement = document.getElementById("lastUpdate");
   const agoElement = document.getElementById("lastUpdateAgo");
 
   if (!lastHeartbeatAt) {
+
     timeElement.textContent = "Waiting for heartbeat...";
     agoElement.textContent = "No heartbeat received yet";
+
     return;
   }
 
   const now = Date.now();
-  const elapsed = Math.max(0, Math.floor((now - lastHeartbeatAt) / 1000));
 
-  timeElement.textContent = new Date(lastHeartbeatAt).toLocaleTimeString(
-    "en-GB",
-    {
-      timeZone: "Asia/Dhaka",
-      hour12: true
-    }
+  const elapsed = Math.max(
+    0,
+    Math.floor((now - lastHeartbeatAt) / 1000)
   );
+
+  timeElement.textContent = new Date(
+    lastHeartbeatAt
+  ).toLocaleTimeString("en-GB", {
+    timeZone: "Asia/Dhaka",
+    hour12: true
+  });
 
   let agoText;
 
   if (elapsed < 60) {
+
     agoText = elapsed + (elapsed === 1 ? " sec ago" : " secs ago");
+
   } else if (elapsed < 3600) {
+
     const minutes = Math.floor(elapsed / 60);
+
     agoText = minutes + (minutes === 1 ? " min ago" : " mins ago");
+
   } else if (elapsed < 86400) {
+
     const hours = Math.floor(elapsed / 3600);
+
     agoText = hours + (hours === 1 ? " hr ago" : " hrs ago");
+
   } else {
+
     const days = Math.floor(elapsed / 86400);
+
     agoText = days + (days === 1 ? " day ago" : " days ago");
+
   }
 
   agoElement.textContent = "Last heartbeat " + agoText;
