@@ -69,16 +69,9 @@ header{
 }
 .signal-dot.offline{background:#9ca3af}
 @keyframes signalBlink{
-  0%,100%{
-    background:#ffffff;
-    box-shadow:0 0 4px #ffffff
-  }
-  50%{
-    background:#22c55e;
-    box-shadow:0 0 9px #22c55e
-  }
+  0%,100%{background:#ffffff;box-shadow:0 0 4px #ffffff}
+  50%{background:#22c55e;box-shadow:0 0 9px #22c55e}
 }
-
 nav{
   display:flex;
   justify-content:center;
@@ -100,7 +93,6 @@ nav button{
 }
 nav button.active{background:#0f766e;color:white}
 nav button:hover{background:#0d9488;color:white}
-
 .container{max-width:1500px;margin:auto;padding:20px}
 .section{display:none}
 .section.active{display:block}
@@ -138,22 +130,17 @@ nav button:hover{background:#0d9488;color:white}
 }
 .feeder-card.on{border-left-color:#16a34a}
 .feeder-card.off{border-left-color:#dc2626}
-
 .feeder-card.disconnected{
   border-left-color:#9ca3af;
   background:#e5e7eb;
-  box-shadow:none;
+  box-shadow:none
 }
 .feeder-card.disconnected .feeder-name,
 .feeder-card.disconnected .area-list,
-.feeder-card.disconnected .last-change{
-  color:#6b7280;
-}
+.feeder-card.disconnected .last-change{color:#6b7280}
 .feeder-card.disconnected .status-pill{
-  background:#d1d5db;
-  color:#4b5563;
+  background:#d1d5db;color:#4b5563
 }
-
 .feeder-head{
   display:flex;
   justify-content:space-between;
@@ -170,7 +157,6 @@ nav button:hover{background:#0d9488;color:white}
 .status-on{background:#dcfce7;color:#166534}
 .status-off{background:#fee2e2;color:#991b1b}
 .status-unknown{background:#d1d5db;color:#4b5563}
-
 .area-list{
   font-size:12px;
   line-height:1.8;
@@ -178,11 +164,7 @@ nav button:hover{background:#0d9488;color:white}
   margin-top:10px;
   overflow-wrap:anywhere
 }
-.last-change{
-  margin-top:9px;
-  font-size:11px;
-  color:#94a3b8
-}
+.last-change{margin-top:9px;font-size:11px;color:#94a3b8}
 .panel{
   background:white;
   border-radius:11px;
@@ -193,28 +175,16 @@ nav button:hover{background:#0d9488;color:white}
 .panel h3{margin:0 0 15px;font-size:16px}
 .sld-wrap{overflow-x:auto}
 .sld-wrap svg{min-width:700px;width:100%;height:auto}
-.sld-label{
-  font-family:Arial,sans-serif;
-  font-size:13px;
-  fill:#334155
-}
+.sld-label{font-family:Arial,sans-serif;font-size:13px;fill:#334155}
 .sld-line{stroke:#64748b;stroke-width:3;fill:none}
 .sld-live{stroke:#16a34a;stroke-width:4;fill:none}
 .sld-off{stroke:#dc2626;stroke-width:3;fill:none}
 .sld-box{fill:#f8fafc;stroke:#64748b;stroke-width:2}
 .sld-transformer{fill:#fef3c7;stroke:#d97706;stroke-width:2}
-.sld-disconnected{
-  stroke:#9ca3af !ant;
-  fill:#e5e7eb !ant;
-}
+.sld-disconnected{stroke:#9ca3af !important;fill:#e5e7eb !important}
 .sld-disconnected-text{fill:#6b7280 !important}
-
 .table-wrap{overflow-x:auto}
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:600px
-}
+table{width:100%;border-collapse:collapse;min-width:600px}
 th,td{
   text-align:left;
   padding:11px 12px;
@@ -281,12 +251,58 @@ tr:hover td{background:#f8fafc}
   font-size:12px
 }
 .empty{text-align:center;color:#94a3b8;padding:25px}
-footer{
-  text-align:center;
-  padding:20px;
-  font-size:11px;
-  color:#94a3b8
+footer{text-align:center;padding:20px;font-size:11px;color:#94a3b8}
+
+.logout-btn{
+  border:0;
+  background:#dc2626;
+  color:white;
+  padding:9px 14px;
+  border-radius:7px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-left:auto
 }
+#loginPanel{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f1f5f9;
+  padding:20px
+}
+.login-box{
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  width:100%;
+  max-width:380px;
+  box-shadow:0 4px 20px #0002
+}
+.login-box h2{text-align:center;color:#0f172a;margin-top:0}
+.login-box p{text-align:center;color:#64748b;font-size:13px}
+.login-box label{font-size:13px;font-weight:bold;color:#334155}
+.login-box input{
+  width:100%;
+  padding:12px;
+  margin:8px 0 16px;
+  border:1px solid #cbd5e1;
+  border-radius:7px;
+  font-size:14px
+}
+.login-box button{
+  width:100%;
+  padding:12px;
+  background:#0f766e;
+  color:white;
+  border:0;
+  border-radius:7px;
+  font-weight:bold;
+  cursor:pointer
+}
+.login-box button:disabled{opacity:.6;cursor:wait}
+#loginError{color:#dc2626;display:none;margin-top:12px;text-align:left}
+
 @media(max-width:600px){
   header{padding:16px}
   .header-title h1{font-size:21px}
@@ -298,15 +314,51 @@ footer{
 
 <body>
 
+<!-- LOGIN PANEL -->
+<div id="loginPanel">
+  <form id="loginForm" class="login-box">
+    <h2>Kishoreganj PBS</h2>
+    <p>Kishoreganj-1 (HQ) 20 MVA Substation</p>
+
+    <label>Email Address</label>
+    <input
+      id="loginEmail"
+      type="email"
+      placeholder="Enter your email"
+      autocomplete="username"
+      required
+    >
+
+    <label>Password</label>
+    <input
+      id="loginPassword"
+      type="password"
+      placeholder="Enter your password"
+      autocomplete="current-password"
+      required
+    >
+
+    <button id="loginButton" type="submit">LOGIN</button>
+    <div id="loginError"></div>
+  </form>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardApp" style="display:none">
+
 <header>
   <div class="header-top">
     <div class="header-title">
       <h1>Kishoreganj PBS</h1>
       <p>Kishoreganj-1 (HQ) 20 MVA Substation</p>
     </div>
-    <div class="info-card">
-      <span class="info-label">BANGLADESH STANDARD TIME</span>
-      <span class="info-value" id="liveClock">Loading...</span>
+
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="info-card">
+        <span class="info-label">BANGLADESH STANDARD TIME</span>
+        <span class="info-value" id="liveClock">Loading...</span>
+      </div>
+      <button class="logout-btn" id="logoutButton">LOGOUT</button>
     </div>
   </div>
 
@@ -315,36 +367,25 @@ footer{
       <span class="info-label">LAST UPDATE</span>
       <span class="info-value" id="lastUpdate">Waiting for data...</span>
     </div>
-
     <div class="info-card">
       <span class="info-label">LAST EVENT</span>
       <span class="info-value" id="lastEvent">No event received</span>
     </div>
-
     <div class="info-card">
       <span class="info-label">SUBSTATION STATUS</span>
-      <span class="info-value substation-disconnected"
-            id="substationStatus">● CHECKING...</span>
+      <span class="info-value substation-disconnected" id="substationStatus">● CHECKING...</span>
     </div>
-
     <div class="info-card">
       <span class="info-label">FIREBASE CONNECTION</span>
-      <span class="info-value firebase-offline"
-            id="firebaseStatus">● CONNECTING...</span>
+      <span class="info-value firebase-offline" id="firebaseStatus">● CONNECTING...</span>
     </div>
   </div>
 </header>
 
 <nav>
-  <button class="active" onclick="showSection('mapSection',this)">
-    Feeder Map
-  </button>
-  <button onclick="showSection('sldSection',this)">
-    Single Line Diagram
-  </button>
-  <button onclick="showSection('historySection',this)">
-    Event History & Analysis
-  </button>
+  <button class="active" onclick="showSection('mapSection',this)">Feeder Map</button>
+  <button onclick="showSection('sldSection',this)">Single Line Diagram</button>
+  <button onclick="showSection('historySection',this)">Event History & Analysis</button>
 </nav>
 
 <div class="container">
@@ -357,7 +398,6 @@ footer{
 
   <!-- FEEDER MAP -->
   <section id="mapSection" class="section active">
-
     <h2 class="section-title">33/11 kV Feeder Status</h2>
 
     <div class="summary-grid">
@@ -384,60 +424,29 @@ footer{
 
   <!-- SINGLE LINE DIAGRAM -->
   <section id="sldSection" class="section">
-
     <h2 class="section-title">33/11 kV Substation Single Line Diagram</h2>
 
     <div class="panel">
       <div class="sld-wrap">
         <svg viewBox="0 0 900 560" id="sldSvg">
-
-          <text x="450" y="28" text-anchor="middle"
-                class="sld-label" style="font-weight:bold;font-size:17px">
+          <text x="450" y="28" text-anchor="middle" class="sld-label" style="font-weight:bold;font-size:17px">
             KISHOREGANJ-1 (HQ) 20 MVA SUBSTATION
           </text>
-
-          <text x="450" y="65" text-anchor="middle" class="sld-label">
-            33 kV INCOMING
-          </text>
-
-          <line id="incomingLine" x1="450" y1="80" x2="450" y2="150"
-                class="sld-off"/>
-
-          <rect id="sldVcb" x="420" y="105" width="60" height="28" rx="4"
-                class="sld-box"/>
-          <text x="450" y="123" text-anchor="middle" class="sld-label">
-            VCB
-          </text>
-
-          <line id="transformerLine" x1="450" y1="150" x2="450" y2="195"
-                class="sld-off"/>
-
-          <rect id="sldTransformer" x="390" y="195" width="120" height="65"
-                rx="8" class="sld-transformer"/>
-          <text x="450" y="221" text-anchor="middle" class="sld-label">
-            POWER TRANSFORMER
-          </text>
-          <text x="450" y="242" text-anchor="middle" class="sld-label">
-            33/11 kV - 20 MVA
-          </text>
-
-          <line id="busFeed" x1="450" y1="260" x2="450" y2="310"
-                class="sld-off"/>
-
-          <line id="busbar" x1="90" y1="310" x2="810" y2="310"
-                class="sld-off" style="stroke-width:7"/>
-
-          <text x="450" y="295" text-anchor="middle" class="sld-label">
-            11 kV BUSBAR
-          </text>
-
+          <text x="450" y="65" text-anchor="middle" class="sld-label">33 kV INCOMING</text>
+          <line id="incomingLine" x1="450" y1="80" x2="450" y2="150" class="sld-off"/>
+          <rect id="sldVcb" x="420" y="105" width="60" height="28" rx="4" class="sld-box"/>
+          <text x="450" y="123" text-anchor="middle" class="sld-label">VCB</text>
+          <line id="transformerLine" x1="450" y1="150" x2="450" y2="195" class="sld-off"/>
+          <rect id="sldTransformer" x="390" y="195" width="120" height="65" rx="8" class="sld-transformer"/>
+          <text x="450" y="221" text-anchor="middle" class="sld-label">POWER TRANSFORMER</text>
+          <text x="450" y="242" text-anchor="middle" class="sld-label">33/11 kV - 20 MVA</text>
+          <line id="busFeed" x1="450" y1="260" x2="450" y2="310" class="sld-off"/>
+          <line id="busbar" x1="90" y1="310" x2="810" y2="310" class="sld-off" style="stroke-width:7"/>
+          <text x="450" y="295" text-anchor="middle" class="sld-label">11 kV BUSBAR</text>
           <g id="sldFeeders"></g>
-
-          <text x="450" y="535" text-anchor="middle"
-                class="sld-label">
+          <text x="450" y="535" text-anchor="middle" class="sld-label">
             Feeder status is based on ESP32 input signals and live counter signal
           </text>
-
         </svg>
       </div>
     </div>
@@ -458,30 +467,15 @@ footer{
 
   <!-- EVENT HISTORY -->
   <section id="historySection" class="section">
-
     <h2 class="section-title">Event History & Analysis</h2>
 
     <div class="panel">
       <h3>Event Date Filter</h3>
-
       <div class="filter-row">
-        <label>
-          From Date
-          <input type="date" id="fromDate">
-        </label>
-
-        <label>
-          To Date
-          <input type="date" id="toDate">
-        </label>
-
-        <button class="action-btn" onclick="applyFilters()">
-          Apply Filter
-        </button>
-
-        <button class="action-btn secondary" onclick="clearFilters()">
-          Clear Filter
-        </button>
+        <label>From Date<input type="date" id="fromDate"></label>
+        <label>To Date<input type="date" id="toDate"></label>
+        <button class="action-btn" onclick="applyFilters()">Apply Filter</button>
+        <button class="action-btn secondary" onclick="clearFilters()">Clear Filter</button>
       </div>
 
       <div class="summary-grid">
@@ -516,12 +510,7 @@ footer{
       <div class="table-wrap">
         <table>
           <thead>
-            <tr>
-              <th>SL</th>
-              <th>Date & Time</th>
-              <th>Feeder</th>
-              <th>Status</th>
-            </tr>
+            <tr><th>SL</th><th>Date & Time</th><th>Feeder</th><th>Status</th></tr>
           </thead>
           <tbody id="eventTable">
             <tr><td colspan="4" class="empty">Waiting for events...</td></tr>
@@ -529,7 +518,6 @@ footer{
         </table>
       </div>
     </div>
-
   </section>
 
 </div>
@@ -538,21 +526,25 @@ footer{
   Kishoreganj Palli Bidyut Samity | Substation Live Monitoring System
 </footer>
 
+</div><!-- END DASHBOARD -->
+
 <script type="module">
 
 import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 import {
   getDatabase,
   ref,
   onValue
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 /* FIREBASE CONFIGURATION */
 
@@ -568,23 +560,90 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-  
 const auth = getAuth(app);
-
-await signInWithEmailAndPassword(
-  auth,
-  "kishoreganj-1ss@gmail.com",
-  "456123"
-);
 const db = getDatabase(app);
+
+/* LOGIN */
+
+const loginPanel = document.getElementById("loginPanel");
+const dashboardApp = document.getElementById("dashboardApp");
+const loginForm = document.getElementById("loginForm");
+const loginError = document.getElementById("loginError");
+const loginButton = document.getElementById("loginButton");
+
+let dashboardStarted = false;
+
+loginForm.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+
+  loginButton.disabled = true;
+  loginButton.textContent = "PLEASE WAIT...";
+  loginError.style.display = "none";
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(error) {
+    console.error("Login error:", error);
+
+    const messages = {
+      "auth/invalid-credential": "Incorrect email or password.",
+      "auth/user-not-found": "User account not found.",
+      "auth/wrong-password": "Incorrect password.",
+      "auth/invalid-email": "Invalid email address.",
+      "auth/too-many-requests": "Too many attempts. Please try again later.",
+      "auth/unauthorized-domain": "This website domain is not authorized in Firebase Authentication."
+    };
+
+    loginError.textContent =
+      messages[error.code] || error.message;
+
+    loginError.style.display = "block";
+  } finally {
+    loginButton.disabled = false;
+    loginButton.textContent = "LOGIN";
+  }
+});
+
+/* LOGOUT */
+
+document.getElementById("logoutButton").addEventListener("click", async function() {
+  try {
+    await signOut(auth);
+  } catch(error) {
+    console.error("Logout error:", error);
+    alert("Logout failed: " + error.message);
+  }
+});
+
+/* AUTHENTICATION STATE */
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    loginPanel.style.display = "none";
+    dashboardApp.style.display = "block";
+
+    if (!dashboardStarted) {
+      dashboardStarted = true;
+      startDashboard();
+    }
+  } else {
+    dashboardApp.style.display = "none";
+    loginPanel.style.display = "flex";
+    dashboardStarted = false;
+  }
+});
+
+/* START DASHBOARD ONLY AFTER LOGIN */
+
+function startDashboard() {
 
 /* FEEDER SERVICE AREAS */
 
 const feederAreas = {
-  "Feeder-1": [
-    "মুকসেদপুর",
-    "নতুন পল্লী"
-  ],
+  "Feeder-1": ["মুকসেদপুর", "নতুন পল্লী"],
   "Feeder-2": [
     "তেরহাসিয়া, পুটিপাড়া, বৌলাইবাজার",
     "দঃরাজকুন্তি, উঃরাজকুন্তি, পাঠানপাড়া, নাকভাঙ্গা, জাল্লাবাদ",
@@ -618,12 +677,7 @@ const feederAreas = {
     "ভাসানিপাড়া, ইসলামপুর, মিলনগঞ্জবাজার"
   ],
   "Feeder-4": [
-    "কাটাবাড়িয়া",
-    "বড়ভাগ",
-    "ভাটগাও",
-    "আলমপুর",
-    "সাদুল্লাহ",
-    "ব্রাহ্মনকচুরী"
+    "কাটাবাড়িয়া","বড়ভাগ","ভাটগাও","আলমপুর","সাদুল্লাহ","ব্রাহ্মনকচুরী"
   ],
   "Feeder-5": [
     "সগড়া, রশিদাবাদ, লতিবপুর, শ্রীমন্তপুর, বারতোপা",
@@ -636,9 +690,7 @@ const feederAreas = {
     "ঝাটাসিড়া, খিলপাড়া, পাঠানকান্দি, কাতিয়ারচর",
     "প্যারাভাঙ্গা, কুট্রাগড়, দনাইল"
   ],
-  "Feeder-7": [
-    "মুকসেদপুর, পাসপোর্ট অফিস"
-  ],
+  "Feeder-7": ["মুকসেদপুর, পাসপোর্ট অফিস"],
   "Feeder-8": [
     "মুকসেদপুর, খিরদাবাজার, ভদ্রপাড়া, কলাপাড়া, বাদেশোলাকিয়া, হাজরাদী, রগুখালী, বৌলাই",
     "চং শোলাকিয়া, গাংগাইল"
@@ -653,10 +705,6 @@ let filteredEvents = [];
 let firebaseConnected = false;
 let feederDataLoaded = false;
 
-// ESP32 heartbeat counter monitoring.
-// The browser must observe a CHANGED counter value;
-// an old cached Firebase value alone never means online.
-
 let heartbeatInitialized = false;
 let lastHeartbeatValue = null;
 let lastHeartbeatAt = 0;
@@ -665,12 +713,6 @@ const HEARTBEAT_TIMEOUT_MS = 8000;
 
 let countChart = null;
 let durationChart = null;
-
-/*
-  Connectivity intervals are stored locally in this browser.
-  Outage duration is accumulated only while Firebase is connected
-  and the live feeder snapshot is available.
-*/
 
 const FEEDER_CACHE = "kpbshq_feeder_cache";
 const EVENT_CACHE = "kpbshq_event_cache";
@@ -683,10 +725,8 @@ let lastRenderedConnectionState = null;
 
 try {
   const savedIntervals = localStorage.getItem(ONLINE_INTERVAL_CACHE);
-
   if (savedIntervals) {
     const parsed = JSON.parse(savedIntervals);
-
     if (Array.isArray(parsed)) {
       onlineIntervals = parsed
         .filter(item => Array.isArray(item) &&
@@ -696,7 +736,7 @@ try {
         .map(item => [Number(item[0]), Number(item[1])]);
     }
   }
-} catch (error) {
+} catch(error) {
   console.warn("Could not restore online intervals:", error);
 }
 
@@ -707,14 +747,11 @@ function timestampToMs(value) {
 
   if (typeof value === "string" &&
       !/^\d+(\.\d+)?$/.test(value.trim())) {
-
     const parsedDate = Date.parse(value);
-
     return Number.isFinite(parsedDate) ? parsedDate : 0;
   }
 
   const number = Number(value);
-
   if (!Number.isFinite(number) || number <= 0) return 0;
 
   return number < 100000000000 ? number * 1000 : number;
@@ -722,9 +759,7 @@ function timestampToMs(value) {
 
 function bdTime(timestamp) {
   if (!timestamp) return "N/A";
-
   const date = new Date(timestampToMs(timestamp));
-
   if (Number.isNaN(date.getTime())) return "N/A";
 
   return date.toLocaleString("en-GB", {
@@ -798,8 +833,6 @@ onValue(ref(db, ".info/connected"), snapshot => {
 
   if (!firebaseConnected) {
     feederDataLoaded = false;
-
-    // Require a new counter change after Firebase reconnects.
     heartbeatInitialized = false;
     lastHeartbeatValue = null;
     lastHeartbeatAt = 0;
@@ -807,18 +840,9 @@ onValue(ref(db, ".info/connected"), snapshot => {
 
   updateFirebaseStatus();
   updateSubstationStatus();
-});
+}, error => handleFirebaseError(error, "Firebase Connection"));
 
 /* ESP32 HEARTBEAT COUNTER */
-
-/*
-  ESP32 writes an increasing integer to:
-  /Substation/Meta/HeartbeatCounter
-
-  A changed value is a fresh signal.
-  If it does not change for 8 seconds,
-  the ESP32 is treated as disconnected.
-*/
 
 onValue(ref(db, "Substation/Meta/HeartbeatCounter"), snapshot => {
   const rawValue = snapshot.val();
@@ -830,76 +854,53 @@ onValue(ref(db, "Substation/Meta/HeartbeatCounter"), snapshot => {
     Number.isFinite(value)
   ) {
     if (!heartbeatInitialized) {
-
-      // First snapshot may be an old database value.
-      // Use it only as the baseline.
-
       heartbeatInitialized = true;
       lastHeartbeatValue = value;
-
     } else if (value !== lastHeartbeatValue) {
-
       lastHeartbeatValue = value;
       lastHeartbeatAt = Date.now();
     }
-
   } else if (!heartbeatInitialized) {
-
-    // If the path is empty at page load,
-    // the first arriving integer is fresh.
-
     heartbeatInitialized = true;
     lastHeartbeatValue = null;
   }
 
   updateSubstationStatus();
 
-}, error => handleFirebaseError(error));
+}, error => handleFirebaseError(error, "Heartbeat"));
 
 /* SUBSTATION STATUS */
 
 function isSubstationConnected() {
-
   const heartbeatFresh =
     lastHeartbeatAt > 0 &&
     (Date.now() - lastHeartbeatAt) <= HEARTBEAT_TIMEOUT_MS;
 
-  return firebaseConnected &&
-         feederDataLoaded &&
-         heartbeatFresh;
+  return firebaseConnected && feederDataLoaded && heartbeatFresh;
 }
 
 function saveOnlineIntervals() {
-
   if (onlineIntervals.length > 10000) {
     onlineIntervals = onlineIntervals.slice(-10000);
   }
 
   try {
-    localStorage.setItem(
-      ONLINE_INTERVAL_CACHE,
-      JSON.stringify(onlineIntervals)
-    );
-  } catch (error) {
+    localStorage.setItem(ONLINE_INTERVAL_CACHE, JSON.stringify(onlineIntervals));
+  } catch(error) {
     console.warn("Could not save online intervals:", error);
   }
 }
 
 function updateOnlineIntervalState(connected) {
-
   const now = Date.now();
 
   if (connected && lastSubstationConnected !== true) {
-
     onlineStartMs = now;
-
   } else if (!connected && lastSubstationConnected === true) {
-
     if (onlineStartMs > 0 && now > onlineStartMs) {
       onlineIntervals.push([onlineStartMs, now]);
       saveOnlineIntervals();
     }
-
     onlineStartMs = 0;
   }
 
@@ -907,7 +908,6 @@ function updateOnlineIntervalState(connected) {
 }
 
 function updateSubstationStatus() {
-
   const element = document.getElementById("substationStatus");
   const connected = isSubstationConnected();
   const warning = document.getElementById("offlineWarning");
@@ -920,25 +920,19 @@ function updateSubstationStatus() {
   lastRenderedConnectionState = connected;
 
   if (connected) {
-
     element.innerHTML =
       '<span class="signal-dot online"></span>SUBSTATION CONNECTED';
 
     element.className = "info-value substation-connected";
 
-    if (firebaseConnected) {
-      warning.style.display = "none";
-    }
-
+    if (firebaseConnected) warning.style.display = "none";
   } else {
-
     element.innerHTML =
       '<span class="signal-dot offline"></span>SUBSTATION NOT CONNECTED';
 
     element.className = "info-value substation-disconnected";
 
     if (firebaseConnected) {
-
       warning.textContent =
         "⚠ ESP32 signal not received. Substation is not connected; feeder status and outage-duration counting are paused.";
 
@@ -956,7 +950,6 @@ function updateSubstationStatus() {
   }
 }
 
-// Check the counter timeout every second.
 setInterval(updateSubstationStatus, 1000);
 
 /* LAST UPDATE */
@@ -972,11 +965,8 @@ function markDataReceived() {
 /* STATUS NORMALIZATION */
 
 function isFeederOn(value) {
-
   if (value === true || value === 1) return true;
-
   const text = String(value ?? "").trim().toUpperCase();
-
   return ["ON", "HIGH", "TRUE", "1"].includes(text);
 }
 
@@ -987,9 +977,7 @@ function getStatus(value) {
 /* FEEDER MAP */
 
 function renderFeeders() {
-
   const grid = document.getElementById("feederGrid");
-
   if (!grid) return;
 
   grid.innerHTML = "";
@@ -1001,25 +989,18 @@ function renderFeeders() {
   let unknownCount = 0;
 
   feederNames.forEach(name => {
-
     const data = feederData[name] || {};
-
     const actualOn = isFeederOn(data.Status);
 
-    const status = !substationOnline
-      ? "UNKNOWN"
-      : (actualOn ? "ON" : "OFF");
+    const status = !substationOnline ? "UNKNOWN" : (actualOn ? "ON" : "OFF");
 
     if (status === "ON") onCount++;
     else if (status === "OFF") offCount++;
     else unknownCount++;
 
     const card = document.createElement("div");
-
     card.className = "feeder-card " +
-      (!substationOnline
-        ? "disconnected"
-        : (actualOn ? "on" : "off"));
+      (!substationOnline ? "disconnected" : (actualOn ? "on" : "off"));
 
     const head = document.createElement("div");
     head.className = "feeder-head";
@@ -1031,15 +1012,10 @@ function renderFeeders() {
     const pill = document.createElement("span");
 
     if (!substationOnline) {
-
       pill.className = "status-pill status-unknown";
       pill.textContent = "● UNKNOWN";
-
     } else {
-
-      pill.className = "status-pill " +
-        (actualOn ? "status-on" : "status-off");
-
+      pill.className = "status-pill " + (actualOn ? "status-on" : "status-off");
       pill.textContent = actualOn ? "● ON" : "● OFF";
     }
 
@@ -1051,18 +1027,15 @@ function renderFeeders() {
 
     const lastChange = document.createElement("div");
     lastChange.className = "last-change";
-
     lastChange.textContent = !substationOnline
       ? "UNKNOWN / COMMUNICATION LOST"
       : "Last Change: " + (data.LastChange || "N/A");
 
     card.append(head, areas, lastChange);
-
     grid.appendChild(card);
   });
 
   document.getElementById("totalFeeders").textContent = 8;
-
   document.getElementById("onFeeders").textContent = onCount;
 
   document.getElementById("offFeeders").textContent =
@@ -1072,21 +1045,13 @@ function renderFeeders() {
     substationOnline ? "Feeders OFF" : "Feeders UNKNOWN";
 
   document.getElementById("availability").textContent =
-    substationOnline
-      ? ((onCount / 8) * 100).toFixed(1) + "%"
-      : "UNKNOWN";
+    substationOnline ? ((onCount / 8) * 100).toFixed(1) + "%" : "UNKNOWN";
 
-  const summaryCards = document.querySelectorAll(
-    "#mapSection .summary-card"
-  );
+  const summaryCards = document.querySelectorAll("#mapSection .summary-card");
 
   summaryCards.forEach(card => {
-
-    card.style.borderLeftColor =
-      substationOnline ? "" : "#9ca3af";
-
-    card.style.background =
-      substationOnline ? "" : "#e5e7eb";
+    card.style.borderLeftColor = substationOnline ? "" : "#9ca3af";
+    card.style.background = substationOnline ? "" : "#e5e7eb";
   });
 
   document.getElementById("onFeeders").style.color =
@@ -1104,9 +1069,7 @@ function renderFeeders() {
 /* SINGLE LINE DIAGRAM */
 
 function renderSLD() {
-
   const svgGroup = document.getElementById("sldFeeders");
-
   if (!svgGroup) return;
 
   svgGroup.innerHTML = "";
@@ -1136,32 +1099,18 @@ function renderSLD() {
   );
 
   document.querySelectorAll("#sldSvg .sld-label").forEach(label => {
-
-    label.classList.toggle(
-      "sld-disconnected-text",
-      !substationOnline
-    );
+    label.classList.toggle("sld-disconnected-text", !substationOnline);
   });
 
   feederNames.forEach((name, index) => {
-
     const x = 90 + index * 102.5;
+    const on = substationOnline && isFeederOn(feederData[name]?.Status);
 
-    const on = substationOnline &&
-      isFeederOn(feederData[name]?.Status);
+    const color = !substationOnline ? "#9ca3af" : (on ? "#16a34a" : "#dc2626");
 
-    const color = !substationOnline
-      ? "#9ca3af"
-      : (on ? "#16a34a" : "#dc2626");
+    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
 
-    const group = document.createElementNS(
-      "http://www.w3.org/2000/svg", "g"
-    );
-
-    const line = document.createElementNS(
-      "http://www.w3.org/2000/svg", "line"
-    );
-
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.setAttribute("x1", x);
     line.setAttribute("y1", 310);
     line.setAttribute("x2", x);
@@ -1169,57 +1118,34 @@ function renderSLD() {
     line.setAttribute("stroke", color);
     line.setAttribute("stroke-width", "4");
 
-    const breaker = document.createElementNS(
-      "http://www.w3.org/2000/svg", "rect"
-    );
-
+    const breaker = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     breaker.setAttribute("x", x - 20);
     breaker.setAttribute("y", 340);
     breaker.setAttribute("width", 40);
     breaker.setAttribute("height", 25);
     breaker.setAttribute("rx", 4);
-
-    breaker.setAttribute(
-      "fill",
-      !substationOnline
-        ? "#e5e7eb"
-        : (on ? "#dcfce7" : "#fee2e2")
-    );
-
+    breaker.setAttribute("fill", !substationOnline ? "#e5e7eb" : (on ? "#dcfce7" : "#fee2e2"));
     breaker.setAttribute("stroke", color);
     breaker.setAttribute("stroke-width", "2");
 
-    const feederText = document.createElementNS(
-      "http://www.w3.org/2000/svg", "text"
-    );
-
+    const feederText = document.createElementNS("http://www.w3.org/2000/svg", "text");
     feederText.setAttribute("x", x);
     feederText.setAttribute("y", 415);
     feederText.setAttribute("text-anchor", "middle");
     feederText.setAttribute("class", "sld-label");
-
     feederText.textContent = "F-" + (index + 1);
 
-    if (!substationOnline) {
-      feederText.classList.add("sld-disconnected-text");
-    }
+    if (!substationOnline) feederText.classList.add("sld-disconnected-text");
 
-    const statusText = document.createElementNS(
-      "http://www.w3.org/2000/svg", "text"
-    );
-
+    const statusText = document.createElementNS("http://www.w3.org/2000/svg", "text");
     statusText.setAttribute("x", x);
     statusText.setAttribute("y", 435);
     statusText.setAttribute("text-anchor", "middle");
     statusText.setAttribute("font-size", "10");
     statusText.setAttribute("fill", color);
-
-    statusText.textContent = on
-      ? "ON"
-      : (substationOnline ? "OFF" : "UNKNOWN");
+    statusText.textContent = on ? "ON" : (substationOnline ? "OFF" : "UNKNOWN");
 
     group.append(line, breaker, feederText, statusText);
-
     svgGroup.appendChild(group);
   });
 }
@@ -1227,11 +1153,7 @@ function renderSLD() {
 /* FEEDER REALTIME DATA */
 
 onValue(ref(db, "Substation/Feeders"), snapshot => {
-
   const data = snapshot.val();
-
-  // All 8 feeder Status values must exist.
-  // ESP32 liveness is checked separately through HeartbeatCounter.
 
   feederDataLoaded = !!data && feederNames.every(name =>
     data[name] &&
@@ -1240,29 +1162,23 @@ onValue(ref(db, "Substation/Feeders"), snapshot => {
   );
 
   if (data) {
-
     feederData = data;
 
     try {
-      localStorage.setItem(
-        FEEDER_CACHE,
-        JSON.stringify(data)
-      );
-    } catch (error) {
+      localStorage.setItem(FEEDER_CACHE, JSON.stringify(data));
+    } catch(error) {
       console.warn("Could not cache feeder data:", error);
     }
   }
 
   updateSubstationStatus();
-
   markDataReceived();
 
-}, error => handleFirebaseError(error));
+}, error => handleFirebaseError(error, "Feeder Data"));
 
 /* EVENT DATA */
 
 onValue(ref(db, "Substation/Events"), snapshot => {
-
   const data = snapshot.val() || {};
 
   eventData = Object.entries(data).map(([key, value]) => ({
@@ -1270,37 +1186,22 @@ onValue(ref(db, "Substation/Events"), snapshot => {
     ...value
   }));
 
-  eventData.sort(
-    (a, b) => getTimestamp(b) - getTimestamp(a)
-  );
+  eventData.sort((a, b) => getTimestamp(b) - getTimestamp(a));
 
-  localStorage.setItem(
-    EVENT_CACHE,
-    JSON.stringify(eventData)
-  );
+  localStorage.setItem(EVENT_CACHE, JSON.stringify(eventData));
 
   renderLastEvent();
-
   applyFilters();
-
   markDataReceived();
 
-}, error => handleFirebaseError(error));
+}, error => handleFirebaseError(error, "Event History"));
 
 function getTimestamp(event) {
-
-  if (event.Timestamp) {
-    return timestampToMs(event.Timestamp) / 1000;
-  }
-
-  if (event.timestamp) {
-    return timestampToMs(event.timestamp) / 1000;
-  }
+  if (event.Timestamp) return timestampToMs(event.Timestamp) / 1000;
+  if (event.timestamp) return timestampToMs(event.timestamp) / 1000;
 
   if (event.DateTime) {
-
     const parsed = Date.parse(event.DateTime);
-
     if (!isNaN(parsed)) return parsed / 1000;
   }
 
@@ -1308,7 +1209,6 @@ function getTimestamp(event) {
 }
 
 function renderLastEvent() {
-
   const element = document.getElementById("lastEvent");
 
   if (!eventData.length) {
@@ -1327,7 +1227,6 @@ function renderLastEvent() {
 /* EVENT FILTER */
 
 window.applyFilters = function() {
-
   const from = document.getElementById("fromDate").value;
   const to = document.getElementById("toDate").value;
 
@@ -1340,59 +1239,42 @@ window.applyFilters = function() {
     : Infinity;
 
   filteredEvents = eventData.filter(event => {
-
     const time = getTimestamp(event);
-
     return time >= fromTime && time <= toTime;
   });
 
   renderEventTable();
-
   renderCharts();
 };
 
 window.clearFilters = function() {
-
   document.getElementById("fromDate").value = "";
   document.getElementById("toDate").value = "";
-
   applyFilters();
 };
 
 /* UPDATE DURATION CHART PERIODICALLY */
 
 setInterval(() => {
-
-  if (
-    document.getElementById("historySection")
-      ?.classList.contains("active")
-  ) {
+  if (document.getElementById("historySection")?.classList.contains("active")) {
     renderCharts();
   }
-
 }, 10000);
 
 /* EVENT TABLE */
 
 function renderEventTable() {
-
   const tbody = document.getElementById("eventTable");
-
   tbody.innerHTML = "";
 
-  document.getElementById("totalEvents").textContent =
-    filteredEvents.length;
+  document.getElementById("totalEvents").textContent = filteredEvents.length;
 
   if (!filteredEvents.length) {
-
-    tbody.innerHTML =
-      '<tr><td colspan="4" class="empty">No events found</td></tr>';
-
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">No events found</td></tr>';
     return;
   }
 
   filteredEvents.forEach((event, index) => {
-
     const tr = document.createElement("tr");
 
     const values = [
@@ -1403,17 +1285,12 @@ function renderEventTable() {
     ];
 
     values.forEach((value, i) => {
-
       const td = document.createElement("td");
-
       td.textContent = value;
 
       if (i === 3) {
-
         td.style.fontWeight = "bold";
-
-        td.style.color =
-          value === "ON" ? "#16a34a" : "#dc2626";
+        td.style.color = value === "ON" ? "#16a34a" : "#dc2626";
       }
 
       tr.appendChild(td);
@@ -1426,10 +1303,7 @@ function renderEventTable() {
 /* INTERRUPTION COUNT AND DURATION */
 
 function getObservedOnlineIntervals() {
-
   const intervals = [...onlineIntervals];
-
-  // Include active interval only while ESP32 signal is fresh.
 
   if (isSubstationConnected() && onlineStartMs > 0) {
     intervals.push([onlineStartMs, Date.now()]);
@@ -1439,18 +1313,15 @@ function getObservedOnlineIntervals() {
 }
 
 function connectedSecondsBetween(startSeconds, endSeconds) {
-
   if (!(endSeconds > startSeconds)) return 0;
 
   const startMs = startSeconds * 1000;
   const endMs = endSeconds * 1000;
-
   const intervals = getObservedOnlineIntervals();
 
   let totalMs = 0;
 
   intervals.forEach(([onlineFrom, onlineTo]) => {
-
     const overlapStart = Math.max(startMs, onlineFrom);
     const overlapEnd = Math.min(endMs, onlineTo);
 
@@ -1462,10 +1333,7 @@ function connectedSecondsBetween(startSeconds, endSeconds) {
   return totalMs / 1000;
 }
 
-/* INTERRUPTION COUNT AND CONNECTED-TIME DURATION */
-
 function calculateOutages() {
-
   const counts = {};
   const durations = {};
 
@@ -1492,31 +1360,25 @@ function calculateOutages() {
     : Date.now() / 1000;
 
   function addConnectedDuration(feeder, start, end) {
-
     const clippedStart = Math.max(start, rangeStart);
     const clippedEnd = Math.min(end, rangeEnd);
 
     if (clippedEnd > clippedStart) {
-
       durations[feeder] +=
         connectedSecondsBetween(clippedStart, clippedEnd) / 3600;
     }
   }
 
   sorted.forEach(event => {
-
     const feeder = event.Feeder;
-
     if (!feeder || !(feeder in counts)) return;
 
     const timestamp = getTimestamp(event);
-
     if (!timestamp) return;
 
     const status = getStatus(event.Status);
 
     if (status === "OFF") {
-
       if (timestamp >= rangeStart && timestamp <= rangeEnd) {
         counts[feeder]++;
       }
@@ -1526,25 +1388,14 @@ function calculateOutages() {
       }
 
     } else if (status === "ON") {
-
       if (openOutages[feeder] !== undefined) {
-
-        addConnectedDuration(
-          feeder,
-          openOutages[feeder],
-          timestamp
-        );
-
+        addConnectedDuration(feeder, openOutages[feeder], timestamp);
         delete openOutages[feeder];
       }
     }
   });
 
-  // An ongoing outage accrues duration only during
-  // periods when the ESP32 signal is available.
-
   Object.entries(openOutages).forEach(([feeder, start]) => {
-
     addConnectedDuration(
       feeder,
       start,
@@ -1552,17 +1403,11 @@ function calculateOutages() {
     );
   });
 
-  const totalInterruptions = Object.values(counts)
-    .reduce((a, b) => a + b, 0);
+  const totalInterruptions = Object.values(counts).reduce((a, b) => a + b, 0);
+  const totalHours = Object.values(durations).reduce((a, b) => a + b, 0);
 
-  const totalHours = Object.values(durations)
-    .reduce((a, b) => a + b, 0);
-
-  document.getElementById("totalInterruptions").textContent =
-    totalInterruptions;
-
-  document.getElementById("totalDuration").textContent =
-    totalHours.toFixed(2) + " h";
+  document.getElementById("totalInterruptions").textContent = totalInterruptions;
+  document.getElementById("totalDuration").textContent = totalHours.toFixed(2) + " h";
 
   return { counts, durations };
 }
@@ -1570,131 +1415,85 @@ function calculateOutages() {
 /* CHARTS */
 
 function renderCharts() {
-
   const { counts, durations } = calculateOutages();
 
-  const labels = feederNames.map(name =>
-    name.replace("Feeder-", "F-")
-  );
+  const labels = feederNames.map(name => name.replace("Feeder-", "F-"));
 
   if (countChart) countChart.destroy();
-
   if (durationChart) durationChart.destroy();
 
-  countChart = new Chart(
-    document.getElementById("countChart"),
-    {
-      type: "bar",
-
-      data: {
-        labels,
-
-        datasets: [{
-          label: "Interruption Count",
-
-          data: feederNames.map(name => counts[name]),
-
-          backgroundColor: "#ef4444",
-
-          borderRadius: 5
-        }]
-      },
-
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-
-        plugins: {
-          legend: { display: false }
-        },
-
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { precision: 0 }
-          }
-        }
+  countChart = new Chart(document.getElementById("countChart"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "Interruption Count",
+        data: feederNames.map(name => counts[name]),
+        backgroundColor: "#ef4444",
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } }
       }
     }
-  );
+  });
 
-  durationChart = new Chart(
-    document.getElementById("durationChart"),
-    {
-      type: "bar",
-
-      data: {
-        labels,
-
-        datasets: [{
-          label: "Duration (Hours)",
-
-          data: feederNames.map(name =>
-            Number(durations[name].toFixed(2))
-          ),
-
-          backgroundColor: "#0d9488",
-
-          borderRadius: 5
-        }]
-      },
-
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-
-        plugins: {
-          legend: { display: false }
-        },
-
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
+  durationChart = new Chart(document.getElementById("durationChart"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "Duration (Hours)",
+        data: feederNames.map(name => Number(durations[name].toFixed(2))),
+        backgroundColor: "#0d9488",
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
     }
-  );
+  });
 }
 
 /* FIREBASE ERROR */
 
-function handleFirebaseError(error) {
-
-  console.error("Firebase error:", error);
+function handleFirebaseError(error, section = "Unknown") {
+  console.error(
+    "Firebase Error in:",
+    section,
+    error.code,
+    error.message
+  );
 
   const box = document.getElementById("firebaseError");
-
   box.style.display = "block";
 
-  if (error.code === "PERMISSION_DENIED") {
-
-    box.textContent =
-      "Firebase permission denied. Please check your Realtime Database read rules.";
-
-  } else {
-
-    box.textContent =
-      "Firebase error: " +
-      (error.message || "Unable to read database.");
-  }
+  box.textContent =
+    "Firebase Error in " + section + ": " +
+    (error.message || "Unable to read database.");
 }
 
 /* RESTORE LAST RECEIVED DATA FROM BROWSER CACHE */
 
 try {
-
   const savedFeeders = localStorage.getItem(FEEDER_CACHE);
 
   if (savedFeeders) {
-
     feederData = JSON.parse(savedFeeders);
-
     renderFeeders();
   }
 
   const savedEvents = localStorage.getItem(EVENT_CACHE);
 
   if (savedEvents) {
-
     eventData = JSON.parse(savedEvents);
 
     eventData.sort(
@@ -1702,12 +1501,10 @@ try {
     );
 
     renderLastEvent();
-
     applyFilters();
   }
 
-} catch (error) {
-
+} catch(error) {
   console.error("Cache restore error:", error);
 }
 
@@ -1715,7 +1512,8 @@ try {
 
 updateSubstationStatus();
 
-</script>
+} // END startDashboard()
 
+</script>
 </body>
 </html>
