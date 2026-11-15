@@ -204,8 +204,8 @@ nav button:hover{background:#0d9488;color:white}
 .sld-box{fill:#f8fafc;stroke:#64748b;stroke-width:2}
 .sld-transformer{fill:#fef3c7;stroke:#d97706;stroke-width:2}
 .sld-disconnected{
-  stroke:#9ca3af !important;
-  fill:#e5e7eb !important;
+  stroke:#9ca3af !ant;
+  fill:#e5e7eb !ant;
 }
 .sld-disconnected-text{fill:#6b7280 !important}
 
@@ -542,6 +542,10 @@ footer{
 
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
   getDatabase,
@@ -549,10 +553,6 @@ import {
   onValue
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-import {
-  getAuth,
-  signInWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 /* FIREBASE CONFIGURATION */
 
