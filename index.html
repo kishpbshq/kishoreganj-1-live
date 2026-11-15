@@ -542,7 +542,11 @@ footer{
 
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
+import {
+  getAuth,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  
 import {
   getDatabase,
   ref,
@@ -564,7 +568,14 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+  
+const auth = getAuth(app);
 
+await signInWithEmailAndPassword(
+  auth,
+  "kishoreganj-1ss@gmail.com",
+  "456123"
+);
 const db = getDatabase(app);
 
 /* FEEDER SERVICE AREAS */
