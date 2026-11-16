@@ -287,6 +287,13 @@ footer{text-align:center;padding:20px;font-size:11px;color:#94a3b8}
   .container{padding:12px}
   nav button{flex:1;padding:11px 8px;font-size:11px}
 }
+  .shutdown-warning{
+  color:red;
+  font-weight:bold;
+  text-align:center;
+  font-size:14px;
+  padding:10px;
+}
 </style>
 </head>
 
@@ -332,7 +339,9 @@ footer{text-align:center;padding:20px;font-size:11px;color:#94a3b8}
     </div>
   </div>
 </header>
-
+<div class="shutdown-warning">
+  Confirming shutdown by watching this feeder status is prohibited. This is on test.
+</div>
 <nav>
   <button class="active" onclick="showSection('mapSection',this)">Feeder Map</button>
   <button onclick="showSection('sldSection',this)">Single Line Diagram</button>
