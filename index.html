@@ -128,8 +128,36 @@ nav button:hover{background:#0d9488;color:white}
   box-shadow:0 2px 8px #0000000c;
   border-left:5px solid #94a3b8
 }
-.feeder-card.on{border-left-color:#16a34a}
-.feeder-card.off{border-left-color:#dc2626}
+
+.feeder-card.on{
+  background:#16a34a;
+  border-left:5px solid #15803d;
+  color:#ffffff;
+}
+
+.feeder-card.off{
+  background:#dc2626;
+  border-left:5px solid #b91c1c;
+  color:#ffffff;
+}
+
+.feeder-card.on .area-list,
+.feeder-card.on .last-change,
+.feeder-card.off .area-list,
+.feeder-card.off .last-change{
+  color:rgba(255,255,255,0.9);
+}
+
+.feeder-card.on .status-pill{
+  background:#ffffff;
+  color:#166534;
+}
+
+.feeder-card.off .status-pill{
+  background:#ffffff;
+  color:#991b1b;
+}
+
 .feeder-card.disconnected{
   border-left-color:#9ca3af;
   background:#e5e7eb;
