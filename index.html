@@ -1195,7 +1195,7 @@ onValue(ref(db, "Substation/Feeders"), snapshot => {
   }
 
   updateSubstationStatus();
-  markDataReceived();
+  /*markDataReceived();*/
 
 }, error => handleFirebaseError(error, "Feeder Data"));
 
@@ -1216,7 +1216,7 @@ onValue(ref(db, "Substation/Events"), snapshot => {
  renderLastEvent();
 applyFilters();
 renderFeeders();
-markDataReceived();
+/*markDataReceived();*/
 
 }, error => handleFirebaseError(error, "Event History"));
 
